@@ -6,3 +6,4 @@ libm/flt-target
 libm/dbl-target
 arithmeticTest-sse-nd
 randomTest-sse-nd
+*.bin
