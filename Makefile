@@ -18,6 +18,21 @@ else
 USE_SOFT_BINARY=
 endif
 
+FPUNAME=
+NDNAME=
+ifdef STREFLOP_X87
+FPUNAME=-x87
+endif
+ifdef STREFLOP_SSE
+FPUNAME=-sse
+endif
+ifdef STREFLOP_SOFT
+FPUNAME=-soft
+endif
+ifdef STREFLOP_NO_DENORMALS
+NDNAME=-nd
+endif
+
 TARGETS = libm/flt-target libm/dbl-target
 LIBM_OBJECTS = $(flt-32-objects) $(dbl-64-objects)
 ifndef STREFLOP_SSE
@@ -25,7 +40,7 @@ TARGETS += libm/ldbl-target
 LIBM_OBJECTS += $(ldbl-96-objects)
 endif
 
-all: streflop.a
+all: streflop.a libstreflop$(FPUNAME)$(NDNAME).so
 
 Random.o: Random.cpp Random.h Makefile FPUSettings.h Math.h streflop.h
 	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) Random.cpp -o Random.o
@@ -52,6 +67,11 @@ else
 	@ln -fs streflop.a libstreflop.a
 endif
 
+libstreflop$(FPUNAME)$(NDNAME).so: Math.o Random.o ${USE_SOFT_BINARY}
+	$(MAKE) -C libm
+	@rm -f libstreflop$(FPUNAME)$(NDNAME).so
+	$(CXX) -o libstreflop$(FPUNAME)$(NDNAME).so.0.0.0 -shared -Wl,-soname=libstreflop$(FPUNAME)$(NDNAME).so.0 $(LDFLAGS) $(LIBM_OBJECTS) Math.o Random.o ${USE_SOFT_BINARY}
+
 arithmeticTest$(EXE_SUFFIX): arithmeticTest.cpp streflop.a
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) arithmeticTest.cpp streflop.a -o $@
 
@@ -60,7 +80,15 @@ randomTest$(EXE_SUFFIX): randomTest.cpp streflop.a
 
 .PHONY : clean package
 clean:
-	-rm -f *.o streflop.a libstreflop.a arithmeticTest$(EXE_SUFFIX) randomTest$(EXE_SUFFIX) ${USE_SOFT_BINARY}
+	@rm -fv *.o                                  \
+		streflop.a                              \
+		libstreflop.a                           \
+		libstreflop$(FPUNAME)$(NDNAME).so       \
+		libstreflop$(FPUNAME)$(NDNAME).so.0     \
+		libstreflop$(FPUNAME)$(NDNAME).so.0.0.0 \
+		arithmeticTest$(EXE_SUFFIX)             \
+		randomTest$(EXE_SUFFIX)                 \
+		${USE_SOFT_BINARY}
 	$(MAKE) -C libm clean
 
 
