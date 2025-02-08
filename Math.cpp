@@ -44,3 +44,36 @@ namespace streflop {
 #endif
 
 }
+
+namespace streflop_libm {
+
+	// MSVC chokes on these constants,
+	// TODO: we need another way to specify them. (hardcode the bitpattern?)
+#ifndef _MSC_VER
+
+    // Constants
+
+    const Simple SimplePositiveInfinity = streflop::SimplePositiveInfinity;
+    const Simple SimpleNegativeInfinity = streflop::SimpleNegativeInfinity;
+    // TODO: non-signaling version
+    const Simple SimpleNaN = streflop::SimpleNaN;
+
+    const Double DoublePositiveInfinity = streflop::DoublePositiveInfinity;
+    const Double DoubleNegativeInfinity = streflop::DoubleNegativeInfinity;
+    // TODO: non-signaling version
+    const Double DoubleNaN = streflop::DoubleNaN;
+
+// Extended are not always available
+#ifdef Extended
+
+    const Extended ExtendedPositiveInfinity = streflop::ExtendedPositiveInfinity;
+    const Extended ExtendedNegativeInfinity = streflop::ExtendedNegativeInfinity;
+    // TODO: non-signaling version
+    const Extended ExtendedNaN = streflop::ExtendedNaN;
+
+#endif
+
+#endif // _MSC_VER
+
+}
+

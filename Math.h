@@ -21,8 +21,20 @@
 namespace streflop_libm {
 using streflop::Simple;
 using streflop::Double;
+
+extern const Simple SimplePositiveInfinity;
+extern const Simple SimpleNegativeInfinity;
+extern const Simple SimpleNaN;
+
+extern const Double DoublePositiveInfinity;
+extern const Double DoubleNegativeInfinity;
+extern const Double DoubleNaN;
+
 #ifdef Extended
 using streflop::Extended;
+extern const Extended ExtendedPositiveInfinity;
+extern const Extended ExtendedNegativeInfinity;
+extern const Extended ExtendedNaN;
 #endif
 
     extern Simple __ieee754_sqrtf(Simple x);

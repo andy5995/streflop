@@ -42,9 +42,10 @@
 /* p as integer. Routine computes sqrt(*x) and stores result in *y          */
 /****************************************************************************/
 
+namespace streflop_libm {
+
 Double fastiroot(Double);
 
-namespace streflop_libm {
 void __mpsqrt(mp_no *x, mp_no *y, int p) {
 #include "mpsqrt.h"
 
