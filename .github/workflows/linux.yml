@@ -36,3 +36,20 @@ jobs:
 
       - name: Check
         run: make check
+
+  meson:
+    runs-on: ubuntu-latest
+    env:
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y --no-install-recommends meson
+
+      - name: Build
+        run: |
+          meson setup _build
+          meson compile -C _build
