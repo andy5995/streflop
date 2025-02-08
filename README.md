@@ -1,3 +1,5 @@
+[![Linux CI](https://github.com/andy5995/streflop/actions/workflows/linux.yml/badge.svg?branch=trunk)](https://github.com/andy5995/streflop/actions/workflows/linux.yml)
+
 ```
 STandalone REproducible FLOating-Point library
 Version 0.3, august 2006.
