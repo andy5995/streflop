@@ -18,6 +18,21 @@ else
 USE_SOFT_BINARY=
 endif
 
+FPUNAME=
+NDNAME=
+ifdef STREFLOP_X87
+FPUNAME=-x87
+endif
+ifdef STREFLOP_SSE
+FPUNAME=-sse
+endif
+ifdef STREFLOP_SOFT
+FPUNAME=-soft
+endif
+ifdef STREFLOP_NO_DENORMALS
+NDNAME=-nd
+endif
+
 TARGETS = libm/flt-target libm/dbl-target
 LIBM_OBJECTS = $(flt-32-objects) $(dbl-64-objects)
 ifndef STREFLOP_SSE
@@ -25,7 +40,7 @@ TARGETS += libm/ldbl-target
 LIBM_OBJECTS += $(ldbl-96-objects)
 endif
 
-all: streflop.a
+all: streflop.a libstreflop$(FPUNAME)$(NDNAME).so.0.0.0 arithmeticTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX) randomTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX)
 
 Random.o: Random.cpp Random.h Makefile FPUSettings.h Math.h streflop.h
 	$(CXX) -c $(CXXFLAGS) $(CPPFLAGS) Random.cpp -o Random.o
@@ -52,15 +67,35 @@ else
 	@ln -fs streflop.a libstreflop.a
 endif
 
-arithmeticTest$(EXE_SUFFIX): arithmeticTest.cpp streflop.a
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) arithmeticTest.cpp streflop.a -o $@
+check: arithmeticTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX)
+	@./$< arithmeticTest$(FPUNAME)$(NDNAME)
+	@md5sum --warn --check arithmeticTest$(FPUNAME)$(NDNAME).md5
 
-randomTest$(EXE_SUFFIX): randomTest.cpp streflop.a
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) randomTest.cpp streflop.a -o $@
+libstreflop$(FPUNAME)$(NDNAME).so.0.0.0: Math.o Random.o ${USE_SOFT_BINARY}
+	$(MAKE) -C libm
+	@rm -f libstreflop$(FPUNAME)$(NDNAME).so
+	$(CXX) -o libstreflop$(FPUNAME)$(NDNAME).so.0.0.0 -shared -Wl,-soname=libstreflop$(FPUNAME)$(NDNAME).so.0 $(LDFLAGS) $(LIBM_OBJECTS) Math.o Random.o ${USE_SOFT_BINARY}
 
-.PHONY : clean package
+arithmeticTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX): arithmeticTest.cpp libstreflop$(FPUNAME)$(NDNAME).so.0.0.0
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) arithmeticTest.cpp libstreflop.a -o $@
+
+randomTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX): randomTest.cpp libstreflop$(FPUNAME)$(NDNAME).so.0.0.0
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) randomTest.cpp libstreflop.a -o $@
+
+.PHONY : clean package check
 clean:
-	-rm -f *.o streflop.a libstreflop.a arithmeticTest$(EXE_SUFFIX) randomTest$(EXE_SUFFIX) ${USE_SOFT_BINARY}
+	@rm -fv *.o                                             \
+		streflop.a                                          \
+		libstreflop.a                                       \
+		libstreflop$(FPUNAME)$(NDNAME).so                   \
+		libstreflop$(FPUNAME)$(NDNAME).so.0                 \
+		libstreflop$(FPUNAME)$(NDNAME).so.0.0.0             \
+		arithmeticTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX)      \
+		arithmeticTest$(FPUNAME)$(NDNAME)_*_basic.bin       \
+		arithmeticTest$(FPUNAME)$(NDNAME)_*_lib.bin         \
+		arithmeticTest$(FPUNAME)$(NDNAME)_*_nan.bin         \
+		randomTest$(FPUNAME)$(NDNAME)$(EXE_SUFFIX)          \
+		${USE_SOFT_BINARY}
 	$(MAKE) -C libm clean
 
 

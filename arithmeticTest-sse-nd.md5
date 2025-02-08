@@ -1,0 +1,6 @@
+a7bf08fc4c3ff85fbdf3380f346d000c  arithmeticTest-sse-nd_double_basic.bin
+7367ea100cd95f03b1d962cfafc83f07  arithmeticTest-sse-nd_double_lib.bin
+b3c62766ca965e841970d9a80414dfc4  arithmeticTest-sse-nd_double_nan.bin
+2abcb9afe59cc848975c09bf58d961ff  arithmeticTest-sse-nd_simple_basic.bin
+8a66620315f8771c67477bd87333b896  arithmeticTest-sse-nd_simple_lib.bin
+6cb3525ab1ea4416a153e1a2e3c21cf5  arithmeticTest-sse-nd_simple_nan.bin
