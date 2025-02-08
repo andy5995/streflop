@@ -1,9 +1,8 @@
-project('streflop-ng', ['c','cpp'],
+project('streflop-ng', ['cpp'],
   default_options: ['cpp_std=c++11'],
   version: '0.1.0'
 )
 
-cc = meson.get_compiler('c')
 cxx = meson.get_compiler('cpp')
 
 extra_flags = [
@@ -11,18 +10,23 @@ extra_flags = [
   '-fsignaling-nans',
   '-fno-strict-aliasing',
   '-mieee-fp',
-  '-mfpmath=sse',
-  '-msse',
-  '-msse2',
   '-fPIC'
   ]
 
 # Compiler definitions
 if get_option('streflop_x87')
-  extra_flags += ['-DSTREFLOP_X87']
+  extra_flags += [
+    '-DSTREFLOP_X87',
+    '-mfpmath=387'
+    ]
 endif
 if get_option('streflop_sse')
-  extra_flags += ['-DSTREFLOP_SSE']
+  extra_flags += [
+    '-DSTREFLOP_SSE',
+    '-msse',
+    '-msse2',
+    '-mfpmath=sse',
+    ]
 endif
 if get_option('streflop_soft')
   extra_flags += ['-DSTREFLOP_SOFT']
@@ -207,9 +211,14 @@ flt32_lib = static_library('flt32', libm_flt32_sources_full,
 #  'w_exp.cpp',
 #  ]
 
+#libm_dbl64_sources_full = []
 #foreach file : libm_dbl64_sources
-#  sources += join_paths('libm/dbl-64', file)
+#  libm_dbl64_sources_full += join_paths('libm/dbl-64', file)
 #endforeach
+
+#dbl64_lib = static_library('dbl64', libm_dbl64_sources_full,
+#   cpp_args: ['-frename-registers', '-Wno-narrowing', '-DLIBM_COMPILING_FLT64=1'],
+#   include_directories : ['.', 'libm', 'libm/headers'])
 
 ## Conditional sources
 #soft_sources = files(
@@ -227,7 +236,11 @@ lib_streflop_ng = library(meson.project_name(),
   # dependencies: libm_dep,
   version : meson.project_version(),
   include_directories : include_directories(['.', 'libm', 'libm/headers']),
-  link_with: [Random_lib, flt32_lib],
+  link_with: [
+    Random_lib,
+    flt32_lib,
+    # dbl64_lib
+    ],
   install: not meson.is_subproject(),
 )
 
@@ -238,14 +251,11 @@ streflop_dep = declare_dependency(
   include_directories: ['.']
   )
 
-
-# Executables
 #test_execs = ['arithmeticTest', 'randomTest']
 #foreach test : test_execs
 #  executable(test,
 #    test + '.cpp',
-#    dependencies: streflop_ng_dep,
-#    cpp_args: cpp_args
+#    dependencies: streflop_dep,
 #  )
 #endforeach
 
