@@ -3,7 +3,7 @@
 ####################################
 
 # 1. Change this to your compiler (g++ 4.1 is recommended). If you're not using g++, check for equivalent options below.
-CXX=g++
+CXX ?= g++
 
 # 2. Set the correct type for your architecture
 # 2a: One of:
