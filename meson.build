@@ -235,7 +235,7 @@ lib_streflop_ng = library(meson.project_name(),
 # https://mesonbuild.com/Subprojects.html
 streflop_dep = declare_dependency(
   link_with : lib_streflop_ng,
-  include_directories: ['.', 'libm', 'libm/headers']
+  include_directories: ['.']
   )
 
 
