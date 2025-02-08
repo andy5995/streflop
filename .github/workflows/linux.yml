@@ -12,7 +12,15 @@ concurrency:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [default]
+        os: [ubuntu-22.04, ubuntu-24.04]
+        cxx: [g++, clang++]
     runs-on: ubuntu-latest
+    env:
+      CXX: ${{ matrix.cxx }}
 
     steps:
       - uses: actions/checkout@v4
