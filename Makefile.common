@@ -8,13 +8,13 @@ CXX=g++
 # 2. Set the correct type for your architecture
 # 2a: One of:
 #STREFLOP_SSE = 1
-STREFLOP_X87 = 1
+#STREFLOP_X87 = 1
 #STREFLOP_SOFT = 1
 # 2b. And optionally:
 #STREFLOP_NO_DENORMALS = 1
 
 # 3. Set optimization options. You may add -march=you_cpu here for example
-CXXFLAGS = -O3 -pipe -g -frename-registers
+CXXFLAGS = -O3 -pipe -g -frename-registers -fPIC -Wno-narrowing
 #CXXFLAGS = -O0 -pipe -g
 
 
