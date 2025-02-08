@@ -1,0 +1,9 @@
+a7bf08fc4c3ff85fbdf3380f346d000c  arithmeticTest-soft_double_basic.bin
+7367ea100cd95f03b1d962cfafc83f07  arithmeticTest-soft_double_lib.bin
+825de4e5d8c4742e34d809d2a101c720  arithmeticTest-soft_double_nan.bin
+d4f841e6dd0ba1345558ad52aea06f12  arithmeticTest-soft_extended_basic.bin
+9da3a7258b0c12b1645d046d0f7ae9ac  arithmeticTest-soft_extended_lib.bin
+8f9f221b0e0f215505bc8e128ed19d38  arithmeticTest-soft_extended_nan.bin
+2abcb9afe59cc848975c09bf58d961ff  arithmeticTest-soft_simple_basic.bin
+8a66620315f8771c67477bd87333b896  arithmeticTest-soft_simple_lib.bin
+78aaf83f9fe476803b5c8d7373d4f10f  arithmeticTest-soft_simple_nan.bin

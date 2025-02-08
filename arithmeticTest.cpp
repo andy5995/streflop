@@ -12,6 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 using namespace std;
 // clock
 #include <time.h>
@@ -54,21 +55,24 @@ template<class FloatType> void doTest(string s, string name) {
 
     streflop_init<FloatType>();
 
-    ofstream basicfile((s + "_" + name + "_basic.bin").c_str());
+    string filename = s + "_" + name + "_basic.bin";
+    ofstream basicfile(filename);
     if (!basicfile) {
-        cout << "Problem creating binary file: " << basicfile << endl;
+        cout << "Problem creating binary file: " << filename << endl;
         exit(2);
     }
 
-    ofstream infnanfile((s + "_" + name + "_nan.bin").c_str());
+    filename = s + "_" + name + "_nan.bin";
+    ofstream infnanfile(filename);
     if (!infnanfile) {
-        cout << "Problem creating binary file: " << infnanfile << endl;
+        cout << "Problem creating binary file: " << filename << endl;
         exit(3);
     }
 
-    ofstream mathlibfile((s + "_" + name + "_lib.bin").c_str());
+    filename = s + "_" + name + "_lib.bin";
+    ofstream mathlibfile(filename);
     if (!mathlibfile) {
-        cout << "Problem creating binary file: " << mathlibfile << endl;
+        cout << "Problem creating binary file: " << filename << endl;
         exit(4);
     }
 

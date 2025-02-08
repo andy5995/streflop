@@ -32,8 +32,8 @@ template<typename F> void checkNRandom() {
     }
     mean /= N;
     var = sqrt(var/N - mean*mean);
-    cout << "meanN (should be 345.6): " << mean << endl;
-    cout << "varN (should be 78.9): " << var << endl;
+    cout << "meanN (should be 345.6): " << static_cast<float>(mean) << endl;
+    cout << "varN (should be 78.9): " << static_cast<float>(var) << endl;
 }
 
 template<bool IEmin, bool IEmax, typename F> void checkRandom() {
@@ -48,8 +48,8 @@ template<bool IEmin, bool IEmax, typename F> void checkRandom() {
     }
     mean /= N;
     var = sqrt(var/N - mean*mean);
-    cout << "mean<"<<IEmin<<","<<IEmax<<"> (should be 400): " << mean << endl;
-    cout << "var<"<<IEmin<<","<<IEmax<<"> = " << var << endl;
+    cout << "mean<"<<IEmin<<","<<IEmax<<"> (should be 400): " << static_cast<float>(mean) << endl;
+    cout << "var<"<<IEmin<<","<<IEmax<<"> = " << static_cast<float>(var) << endl;
 }
 
 template<typename FloatType> void showrate( clock_t start, clock_t stop, int reps )

@@ -1,0 +1,9 @@
+a7bf08fc4c3ff85fbdf3380f346d000c  arithmeticTest-x87-nd_double_basic.bin
+7367ea100cd95f03b1d962cfafc83f07  arithmeticTest-x87-nd_double_lib.bin
+5e92d071e2dc4d20a08bfae5fe6a0e11  arithmeticTest-x87-nd_double_nan.bin
+d4f841e6dd0ba1345558ad52aea06f12  arithmeticTest-x87-nd_extended_basic.bin
+9da3a7258b0c12b1645d046d0f7ae9ac  arithmeticTest-x87-nd_extended_lib.bin
+47352c4075ca8d309c4e558906b31f49  arithmeticTest-x87-nd_extended_nan.bin
+2abcb9afe59cc848975c09bf58d961ff  arithmeticTest-x87-nd_simple_basic.bin
+8a66620315f8771c67477bd87333b896  arithmeticTest-x87-nd_simple_lib.bin
+6b6e542b8c971173d50d4497ba0abeac  arithmeticTest-x87-nd_simple_nan.bin
