@@ -10,5 +10,5 @@ foreach test : test_execs
     dependencies: streflop_dep,
     cpp_args: [type_arg],
   )
-  test('test', exe)
+  test(test, exe)
 endforeach
