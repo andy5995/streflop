@@ -1,12 +1,7 @@
 project(
   'streflop-ng',
   ['cpp'],
-  default_options: [
-    'b_sanitize=address,undefined',
-    'b_lundef=false',
-    'cpp_std=c++11',
-    'warning_level=2',
-  ],
+  default_options: ['cpp_std=c++11', 'warning_level=2'],
   version: '0.3.1',
 )
 
@@ -21,17 +16,31 @@ extra_flags = [
   '-fPIC',
 ]
 
-sources = []
-_soft_static_libs = []
+#add_project_arguments(, language: 'cpp')
+lib_args = cxx.get_supported_arguments(extra_flags)
 
-if get_option('streflop_x87')
-  extra_flags += ['-DSTREFLOP_X87', '-mfpmath=387']
+sources = []
+_softwrapper_static_libs = []
+type_arg = []
+flags = []
+if get_option('x87')
+  type_arg += ['-DSTREFLOP_X87']
+  flags += ['-mfpmath=387']
 endif
-if get_option('streflop_sse')
-  extra_flags += ['-DSTREFLOP_SSE', '-msse', '-msse2', '-mfpmath=sse']
+if get_option('sse')
+  type_arg += ['-DSTREFLOP_SSE']
+  flags += ['-msse', '-msse2', '-mfpmath=sse']
 endif
-if get_option('streflop_soft')
-  extra_flags += ['-DSTREFLOP_SOFT']
+if get_option('soft')
+  type_arg += ['-DSTREFLOP_SOFT']
+endif
+if get_option('no_denormals')
+  type_arg += ['-DSTREFLOP_NO_DENORMALS']
+endif
+
+lib_args += cxx.get_supported_arguments([flags, type_arg])
+
+if get_option('soft')
   sources += 'softfloat/softfloat.cpp'
   configurations = [
     {'defs': ['-DN_SPECIALIZED=32'], 'name': 'SoftFloatWrapperSimple'},
@@ -39,19 +48,15 @@ if get_option('streflop_soft')
     {'defs': ['-DN_SPECIALIZED=96'], 'name': 'SoftFloatWrapperExtended'},
   ]
   foreach conf : configurations
-    _soft_static_libs += static_library(
+    _softwrapper_static_libs += static_library(
       conf['name'],
       ['SoftFloatWrapper.cpp'],
       # include_directories: '.',
-      cpp_args: [conf['defs']],
+      cpp_args: [conf['defs'], lib_args],
     )
   endforeach
 endif
-if get_option('streflop_no_denormals')
-  extra_flags += ['-DSTREFLOP_NO_DENORMALS']
-endif
 
-add_project_arguments(cxx.get_supported_arguments(extra_flags), language: 'cpp')
 # add_project_arguments(cc.get_supported_arguments(extra_flags), language: 'c')
 
 # Dependencies
@@ -65,7 +70,7 @@ libm = static_library(
   'libm',
   ['libm/e_expf.cpp', 'libm/w_expf.cpp'],
   include_directories: ['libm/headers', incdir],
-  cpp_args: '-DLIBM_COMPILING_FLT32',
+  cpp_args: ['-DLIBM_COMPILING_FLT32', lib_args],
 )
 
 libm_flt32_sources = [
@@ -141,10 +146,10 @@ foreach file : libm_flt32_sources
   libm_flt32_sources_full += join_paths('libm/flt-32', file)
 endforeach
 
-flt32_lib = static_library(
+_flt32_lib = static_library(
   'flt32',
   libm_flt32_sources_full,
-  cpp_args: '-DLIBM_COMPILING_FLT32=1',
+  cpp_args: ['-DLIBM_COMPILING_FLT32', lib_args],
   include_directories: [incdir, 'libm/headers'],
 )
 
@@ -236,10 +241,10 @@ foreach file : libm_dbl64_sources
   libm_dbl64_sources_full += join_paths('libm/dbl-64', file)
 endforeach
 
-dbl64_lib = static_library(
+_dbl64_lib = static_library(
   'dbl64',
   libm_dbl64_sources_full,
-  cpp_args: ['-Wno-narrowing', '-DLIBM_COMPILING_DBL64=1'],
+  cpp_args: ['-Wno-narrowing', '-DLIBM_COMPILING_DBL64=1', lib_args],
   include_directories: ['libm/headers', incdir],
 )
 
@@ -248,7 +253,8 @@ lib_streflop_ng = library(
   [sources],
   version: meson.project_version(),
   include_directories: incdir,
-  link_with: [flt32_lib, dbl64_lib, libm, _soft_static_libs],
+  cpp_args: [lib_args],
+  link_with: [_flt32_lib, _dbl64_lib, libm, _softwrapper_static_libs],
   install: not meson.is_subproject(),
 )
 
@@ -259,15 +265,7 @@ streflop_dep = declare_dependency(
   include_directories: '.',
 )
 
-test_execs = [
-  'test001',
-  # 'arithmeticTest',
-  # 'randomTest'
-]
-foreach test : test_execs
-  exe = executable(test, test + '.cpp', dependencies: streflop_dep)
-  test('test', exe)
-endforeach
+subdir('tests')
 
 headers = [
   'FPUSettings.h',

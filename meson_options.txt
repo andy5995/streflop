@@ -1,5 +1,5 @@
 # Build options
-option('streflop_x87', type: 'boolean', value: false, description: 'Enable x87 floating-point')
-option('streflop_sse', type: 'boolean', value: true, description: 'Enable SSE floating-point')
-option('streflop_soft', type: 'boolean', value: false, description: 'Enable software floating-point')
-option('streflop_no_denormals', type: 'boolean', value: true, description: 'Disable denormals')
+option('x87', type: 'boolean', value: false, description: 'Enable x87 floating-point')
+option('sse', type: 'boolean', value: false, description: 'Enable SSE floating-point')
+option('soft', type: 'boolean', value: false, description: 'Enable software floating-point')
+option('no_denormals', type: 'boolean', value: false, description: 'Disable denormals')
