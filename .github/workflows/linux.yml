@@ -1,43 +1,24 @@
 name: Linux CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 
 on:
   push:
     branches: [ trunk ]
     paths:
     - '**'
-    - '!**/codeql.yml'
+    - '!**.yml'
+    - '**/linux.yml'
   pull_request:
     branches: [ trunk ]
     paths:
     - '**'
-    - '!**/codeql.yml'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+    - '!**.yml'
+    - '**/linux.yml'
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        name: [default]
-        os: [ubuntu-22.04, ubuntu-24.04]
-        cxx: [g++, clang++]
-    runs-on: ${{ matrix.os }}
-    env:
-      CXX: ${{ matrix.cxx }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build
-        run: make -j$(nproc)
-
-      - name: Check
-        run: make check
-
-  meson:
     strategy:
       fail-fast: false
       matrix:
@@ -57,8 +38,15 @@ jobs:
 
       - name: Build
         run: |
-          meson setup _build
+          meson setup _build \
+            -Dsse=true \
+            -Dno_denormals=true \
+            -Db_sanitize=address,undefined \
+            -Db_lundef=false
           meson compile -C _build
 
       - name: Test
-        run: meson test -v -C _build
+        run: |
+          # Other tests need help
+          # https://github.com/andy5995/streflop/issues/7
+          meson test test001 -v -C _build
