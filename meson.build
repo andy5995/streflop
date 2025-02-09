@@ -251,13 +251,16 @@ streflop_dep = declare_dependency(
   include_directories: ['.']
   )
 
-#test_execs = ['arithmeticTest', 'randomTest']
-#foreach test : test_execs
-#  executable(test,
-#    test + '.cpp',
-#    dependencies: streflop_dep,
-#  )
-#endforeach
+test_execs = [
+  'test001',
+  # 'arithmeticTest',
+  # 'randomTest'
+]
+foreach test : test_execs
+    exe = executable(test, test + '.cpp',
+    dependencies: streflop_dep)
+    test('test', exe)
+endforeach
 
 headers = [
   'FPUSettings.h',
