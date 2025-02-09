@@ -1,0 +1,41 @@
+name: Windows
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/windows.yml'
+  pull_request:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/windows.yml'
+
+jobs:
+  build-win64:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Python Dependencies
+      run: pip install meson ninja
+
+    - name: Build
+      run: |
+        meson setup _build -Dsse=true -Dno_denormals=true
+
+    - name: Test
+      run: meson test -v -C _build
+
