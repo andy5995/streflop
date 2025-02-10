@@ -64,7 +64,7 @@ sources += ['Math.cpp', 'Random.cpp']
 
 subdir('libm')
 
-lib_streflop_ng = library(
+streflop_ng = library(
   meson.project_name(),
   [sources],
   version: meson.project_version(),
@@ -85,12 +85,18 @@ lib_streflop_ng = library(
 # How to use in a superproject and other info
 # https://mesonbuild.com/Subprojects.html
 streflop_dep = declare_dependency(
-  link_with: lib_streflop_ng,
+  link_with: streflop_ng,
   include_directories: '.',
 )
 
 if not meson.is_subproject()
   subdir('tests')
+
+  pkg = import('pkgconfig')
+  pkg.generate(
+    streflop_ng,
+    description : 'STREFLOP library with SSE FPU and No Denormals')
+
 endif
 
 # TODO: Installation of libraries, headers and docs
