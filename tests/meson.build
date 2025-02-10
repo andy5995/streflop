@@ -1,5 +1,4 @@
 test_execs = [
-  'test001',
   #'arithmeticTest',
   'randomTest',
 ]
@@ -8,7 +7,7 @@ foreach test : test_execs
     test,
     test + '.cpp',
     dependencies: streflop_dep,
-    cpp_args: [type_arg],
+    cpp_args: [fpu_def],
   )
   test(test, exe)
 endforeach

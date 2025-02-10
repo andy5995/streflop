@@ -2,7 +2,7 @@ project(
   'streflop-ng',
   ['cpp'],
   default_options: ['cpp_std=c++11', 'warning_level=2'],
-  version: '0.3.1',
+  version: '0.3.05',
 )
 
 cxx = meson.get_compiler('cpp')
@@ -20,27 +20,28 @@ lib_args = cxx.get_supported_arguments(extra_flags)
 
 sources = []
 _softwrapper_static_libs = []
-type_arg = []
+fpu_def = []
 flags = []
-fpu = get_option('fpu')
-if fpu == 'x87'
-  type_arg += ['-DSTREFLOP_X87']
+fpu_opt = get_option('fpu')
+if fpu_opt == 'x87'
+  fpu_def += ['-DSTREFLOP_X87']
   flags += ['-mfpmath=387']
 endif
-if fpu == 'sse'
-  type_arg += ['-DSTREFLOP_SSE']
+if fpu_opt == 'sse'
+  fpu_def += ['-DSTREFLOP_SSE']
   flags += ['-msse', '-msse2', '-mfpmath=sse']
 endif
-if fpu == 'soft'
-  type_arg += ['-DSTREFLOP_SOFT']
+if fpu_opt == 'soft'
+  fpu_def += ['-DSTREFLOP_SOFT']
 endif
 if get_option('no_denormals')
-  type_arg += ['-DSTREFLOP_NO_DENORMALS']
+  fpu_def += ['-DSTREFLOP']
+  lib_args += ['-DSTREFLOP_NO_DENORMALS']
 endif
 
-lib_args += cxx.get_supported_arguments([flags, type_arg])
+lib_args += cxx.get_supported_arguments([flags, fpu_def])
 
-if fpu == 'soft'
+if fpu_opt == 'soft'
   sources += 'softfloat/softfloat.cpp'
   configurations = [
     {'defs': ['-DN_SPECIALIZED=32'], 'name': 'SoftFloatWrapperSimple'},
@@ -76,7 +77,8 @@ lib_streflop_ng = library(
     _libm,
     _softwrapper_static_libs,
   ],
-  install: not meson.is_subproject(),
+  # install: not meson.is_subproject(),
+  install: false,
   pic: true,
 )
 
@@ -87,22 +89,26 @@ streflop_dep = declare_dependency(
   include_directories: '.',
 )
 
-subdir('tests')
-
-headers = [
-  'FPUSettings.h',
-  'IntegerTypes.h',
-  'Math.h',
-  'Random.h',
-  'SoftFloatWrapper.h',
-  'streflop.h',
-  'System.h',
-  'X87DenormalSquasher.h',
-]
-
 if not meson.is_subproject()
-  install_headers(
-    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
-    subdir: 'streflop',
-  )
+  subdir('tests')
 endif
+
+# TODO: Installation of libraries, headers and docs
+#
+#headers = [
+#  'FPUSettings.h',
+#  'IntegerTypes.h',
+#  'Math.h',
+#  'Random.h',
+#  'SoftFloatWrapper.h',
+#  'streflop.h',
+#  'System.h',
+#  'X87DenormalSquasher.h',
+#]
+
+#if not meson.is_subproject()
+#  install_headers(
+#    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
+#    subdir: 'streflop',
+#  )
+#endif

@@ -10,7 +10,7 @@ subdir('flt-32')
 subdir('dbl-64')
 
 _ldbl96_lib = []
-if fpu != 'sse'
+if fpu_opt != 'sse'
   subdir('ldbl-96')
 endif
 

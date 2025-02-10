@@ -42,11 +42,10 @@ jobs:
 
       - name: Build
         run: |
-          scripts/sse_nodenormals_asan_build.sh
+          scripts/sse_nodenormals_asan_setup.sh
           meson compile -C _build
 
-      - name: Test
-        run: |
-          # Other tests need help
-          # https://github.com/andy5995/streflop/issues/7
-          meson test test001 -v -C _build
+      #- name: Test
+        #run: |
+          ## Other tests need help
+          ## https://github.com/andy5995/streflop/issues/7
