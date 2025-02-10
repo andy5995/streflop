@@ -39,6 +39,29 @@ jobs:
     - name: Build
       run: |
         meson setup _build -Dfpu=sse -Dno_denormals=true
+        meson compile -C _build
+
+    - name: Test
+      run: meson test -v -C _build
+
+  VisualStudio-clang-cl:
+    runs-on: windows-latest
+    env:
+      CC: clang-cl
+      CXX: clang-cl
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install packages
+      run: |
+        python -m pip install meson
+
+    - uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Build
+      run: |
+        meson setup _build -Dfpu=sse -Dno_denormals=true
+        meson compile -C _build
 
     - name: Test
       run: meson test -v -C _build
