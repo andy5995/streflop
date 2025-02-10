@@ -12,8 +12,7 @@ extra_flags = [
   '-frounding-math',
   '-fsignaling-nans',
   '-fno-strict-aliasing',
-  '-mieee-fp',
-  '-fPIC',
+  '-mieee-fp'
 ]
 
 #add_project_arguments(, language: 'cpp')
@@ -71,6 +70,7 @@ libm = static_library(
   ['libm/e_expf.cpp', 'libm/w_expf.cpp'],
   include_directories: ['libm/headers', incdir],
   cpp_args: ['-DLIBM_COMPILING_FLT32', lib_args],
+  pic: true,
 )
 
 libm_flt32_sources = [
@@ -151,6 +151,7 @@ _flt32_lib = static_library(
   libm_flt32_sources_full,
   cpp_args: ['-DLIBM_COMPILING_FLT32', lib_args],
   include_directories: [incdir, 'libm/headers'],
+  pic: true,
 )
 
 libm_dbl64_sources = [
@@ -246,6 +247,7 @@ _dbl64_lib = static_library(
   libm_dbl64_sources_full,
   cpp_args: ['-Wno-narrowing', '-DLIBM_COMPILING_DBL64=1', lib_args],
   include_directories: ['libm/headers', incdir],
+  pic: true,
 )
 
 lib_streflop_ng = library(
@@ -256,6 +258,7 @@ lib_streflop_ng = library(
   cpp_args: [lib_args],
   link_with: [_flt32_lib, _dbl64_lib, libm, _softwrapper_static_libs],
   install: not meson.is_subproject(),
+  pic: true,
 )
 
 # How to use in a superproject and other info
