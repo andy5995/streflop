@@ -1,16 +1,22 @@
 [![Linux CI](https://github.com/andy5995/streflop/actions/workflows/linux.yml/badge.svg?branch=trunk)](https://github.com/andy5995/streflop/actions/workflows/linux.yml)
 
-```
-STandalone REproducible FLOating-Point library
-Version 0.3, august 2006.
+
+# STandalone REproducible FLOating-Point library
+
+Version 0.3.05 (development, 0.3.1 release TBD)
+
+website: https://github.com/andy5995/streflop-ng
+
+Original project website at https://nicolas.brodu.net/en/programmation/streflop/
 Nicolas Brodu. See also the acknowledgments below.
 
+This fork maintained by [Andy Alt](https://github.com/andy5995)
 
 For a quick setup guide, see the "usage" sections below.
 
 
 
-Presentation:
+## Presentation:
 
 Floating-point computations are strongly dependent on the FPU hardware implementation, the compiler and its optimizations, and the system mathematical library (libm). Experiments are usually reproducible only on the same machine with the same system library and the same compiler using the same options. Even then, the C++ standard does NOT guarantee reproducible results. Example:
 
@@ -28,7 +34,7 @@ A related but more general problem is random number generation, often necessary 
 
 May not return the same x across different FPUs / systems / compilers / etc.
 
-
+```
 
 These problems are related to:
 
