@@ -42,11 +42,7 @@ jobs:
 
       - name: Build
         run: |
-          meson setup _build \
-            -Dsse=true \
-            -Dno_denormals=true \
-            -Db_sanitize=address,undefined \
-            -Db_lundef=false
+          scripts/sse_nodenormals_asan_build.sh
           meson compile -C _build
 
       - name: Test

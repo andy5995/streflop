@@ -1,5 +1,3 @@
 # Build options
-option('x87', type: 'boolean', value: false, description: 'Enable x87 floating-point')
-option('sse', type: 'boolean', value: false, description: 'Enable SSE floating-point')
-option('soft', type: 'boolean', value: false, description: 'Enable software floating-point')
+option('fpu', type : 'combo', choices : ['x87', 'sse', 'soft'], value : 'sse')
 option('no_denormals', type: 'boolean', value: false, description: 'Disable denormals')
