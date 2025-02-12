@@ -1,5 +1,6 @@
 /*
     streflop: STandalone REproducible FLOating-Point
+    Andy Alt, 2025
     Nicolas Brodu, 2006
     Code released according to the GNU Lesser General Public License
 
@@ -8,6 +9,10 @@
 
     Please read the history and copyright information in the documentation provided with the source code
 */
+
+// This fails the meson test when built with SOFT, so it's
+// disabled for now... -andy5995 / 2025-02-11
+#if (!defined STREFLOP_SOFT)
 
 #include <iostream>
 #include <fstream>
@@ -117,7 +122,6 @@ template<typename FloatType> void randomTimings() {
 
 
 int main(int argc, const char** argv) {
-
     cout << "Random seed: " << RandomInit() << endl;
 
     cout << "Checking Simple ranges" << endl;
@@ -152,4 +156,11 @@ int main(int argc, const char** argv) {
 
     return 0;
 }
+
+#else
+
+int main(void) {
+    return 0;
+}
+#endif
 

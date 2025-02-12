@@ -38,7 +38,7 @@ jobs:
 
     - name: Build
       run: |
-        meson setup _build -Dfpu=sse -Dno_denormals=true
+        meson setup _build -Dfpu=sse -Ddenormals=false
         meson compile -C _build
 
     - name: Test

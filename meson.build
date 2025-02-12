@@ -6,7 +6,6 @@ project(
 )
 
 cxx = meson.get_compiler('cpp')
-#cc = meson.get_compiler('c')
 
 extra_flags = [
   '-frounding-math',
@@ -20,26 +19,27 @@ lib_args = cxx.get_supported_arguments(extra_flags)
 
 sources = []
 _softwrapper_static_libs = []
-fpu_def = []
+
 flags = []
+denormals_def = '-DSTREFLOP_NO_DENORMALS'
 fpu_opt = get_option('fpu')
 if fpu_opt == 'x87'
-  fpu_def += ['-DSTREFLOP_X87']
+  fpu_def = '-DSTREFLOP_X87'
   flags += ['-mfpmath=387']
 endif
 if fpu_opt == 'sse'
-  fpu_def += ['-DSTREFLOP_SSE']
+  fpu_def = '-DSTREFLOP_SSE'
   flags += ['-msse', '-msse2', '-mfpmath=sse']
 endif
 if fpu_opt == 'soft'
-  fpu_def += ['-DSTREFLOP_SOFT']
+  fpu_def = '-DSTREFLOP_SOFT'
 endif
-if get_option('no_denormals')
-  fpu_def += ['-DSTREFLOP']
-  lib_args += ['-DSTREFLOP_NO_DENORMALS']
+denormals = get_option('denormals')
+if denormals
+  denormals_def = []
 endif
-
-lib_args += cxx.get_supported_arguments([flags, fpu_def])
+lib_args += cxx.get_supported_arguments([flags])
+lib_args += [fpu_def, denormals_def]
 
 if fpu_opt == 'soft'
   sources += 'softfloat/softfloat.cpp'
@@ -87,16 +87,24 @@ streflop_ng = library(
 streflop_dep = declare_dependency(
   link_with: streflop_ng,
   include_directories: '.',
+  compile_args: [fpu_def, denormals_def],
 )
 
 if not meson.is_subproject()
   subdir('tests')
-
+  if denormals
+    denorm_state = 'denormals'
+  else
+    denorm_state = 'no denormals'
+  endif
+  desc = 'STREFLOP library [' + fpu_opt + '] [' + denorm_state + ']'
   pkg = import('pkgconfig')
   pkg.generate(
     streflop_ng,
-    description : 'STREFLOP library with SSE FPU and No Denormals')
-
+    description: desc,
+    url: 'https://github.com/andy5995/streflop-ng',
+    extra_cflags: [fpu_def, denormals_def],
+  )
 endif
 
 # TODO: Installation of libraries, headers and docs
