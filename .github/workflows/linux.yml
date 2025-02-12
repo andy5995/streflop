@@ -42,8 +42,8 @@ jobs:
 
       - name: Build
         run: |
-          # scripts/sse_nodenormals_asan_setup.sh
-          scripts/build-all.sh
+          meson setup _build -Dfpu=sse
+          meson compile -C _build
 
       #- name: Test
         #run: |

@@ -82,10 +82,18 @@ dbl64_sources = [
   'w_exp.cpp',
 ]
 
-_dbl64_lib = static_library(
-  'dbl64',
-  dbl64_sources,
-  cpp_args: ['-Wno-narrowing', '-DLIBM_COMPILING_DBL64=1', lib_args],
-  include_directories: ['../headers', incdir],
-  pic: true,
-)
+_dbl64_lib = []
+foreach conf : streflop_configurations
+  _dbl64_lib += static_library(
+    'dbl64' + conf['suffix'],
+    dbl64_sources,
+    cpp_args: [
+      '-Wno-narrowing',
+      '-DLIBM_COMPILING_DBL64=1',
+      conf['flags'],
+      conf['defs'],
+    ],
+    include_directories: ['../headers', incdir],
+    pic: true,
+  )
+endforeach

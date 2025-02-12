@@ -49,11 +49,19 @@ ldbl96_sources = [
   'w_expl.cpp',
 ]
 
-_ldbl96_lib = static_library(
-  'ldbl96',
-  ldbl96_sources,
-  cpp_args: ['-Wno-narrowing', '-DLIBM_COMPILING_LDBL96', lib_args],
-  include_directories: ['../headers', incdir],
-  pic: true,
-)
+_ldbl96_lib = []
+foreach conf : streflop_configurations
+  _ldbl96_lib += static_library(
+    'ldbl96' + conf['suffix'],
+    ldbl96_sources,
+    cpp_args: [
+      '-Wno-narrowing',
+      '-DLIBM_COMPILING_LDBL96',
+      conf['flags'],
+      conf['defs'],
+    ],
+    include_directories: ['../headers', incdir],
+    pic: true,
+  )
+endforeach
 

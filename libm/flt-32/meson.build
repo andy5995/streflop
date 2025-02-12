@@ -66,10 +66,13 @@ flt32_sources = [
   'w_expf.cpp',
 ]
 
-_flt32_lib = static_library(
-  'flt32',
-  flt32_sources,
-  cpp_args: ['-DLIBM_COMPILING_FLT32', lib_args],
-  include_directories: [incdir, '../headers'],
-  pic: true,
-)
+_flt32_lib = []
+foreach conf : streflop_configurations
+  _flt32_lib += static_library(
+    'flt32' + conf['suffix'],
+    flt32_sources,
+    cpp_args: ['-DLIBM_COMPILING_FLT32', conf['flags'], conf['defs']],
+    include_directories: [incdir, '../headers'],
+    pic: true,
+  )
+endforeach
