@@ -50,6 +50,7 @@ ldbl96_sources = [
 ]
 
 _ldbl96_lib = []
+i = 0
 foreach conf : streflop_configurations
   if conf['fpu'] != 'sse'
     _ldbl96_lib += static_library(
@@ -67,5 +68,6 @@ foreach conf : streflop_configurations
   else
     _ldbl96_lib += []
   endif
+  i = i + 1
 endforeach
 

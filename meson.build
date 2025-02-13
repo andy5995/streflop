@@ -84,7 +84,9 @@ streflop_configurations = [
   },
 ]
 
-if not get_option('build_all')
+build_all = get_option('build_all')
+
+if not build_all
   if (fpu_opt == 'none')
     error('You must choose an fpu or set build_all to true')
   endif
@@ -102,6 +104,10 @@ if not get_option('build_all')
       break
     endif
   endforeach
+else
+  if fpu_opt != 'none'
+    message('fpu option ignored, build_all is true')
+  endif
 endif
 
 _softwrapper_static_libs = []
@@ -129,11 +135,19 @@ incdir = include_directories('libm')
 
 sources += ['Math.cpp', 'Random.cpp']
 
+_internal_libs = [0,0,0,0,0]
+
 subdir('libm')
 
 streflop_ng = []
 i = 0
+ldbl96_i = 0
 foreach conf : streflop_configurations
+  ldbl96_lib = []
+  if conf['fpu'] != 'sse'
+    ldbl96_lib = _ldbl96_lib[ldbl96_i]
+    ldbl96_i = ldbl96_i + 1
+  endif
   streflop_ng += library(
     meson.project_name() + conf['suffix'],
     [sources],
@@ -141,9 +155,9 @@ foreach conf : streflop_configurations
     include_directories: incdir,
     cpp_args: [conf['flags'], conf['defs']],
     link_with: [
-      _flt32_lib,
-      _dbl64_lib,
-      _ldbl96_lib,
+      _flt32_lib[i],
+      _dbl64_lib[i],
+      ldbl96_lib,
       _libm[i],
       _softwrapper_static_libs,
     ],
@@ -166,6 +180,10 @@ foreach conf : streflop_configurations
   )
   i = i + 1
 endforeach
+
+if not build_all
+  streflop_dep = streflop_dep[0]
+endif
 
 is_subproject = meson.is_subproject()
 if not is_subproject
