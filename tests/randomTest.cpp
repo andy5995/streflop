@@ -121,7 +121,7 @@ template<typename FloatType> void randomTimings() {
 }
 
 
-int main(int argc, const char** argv) {
+int main(void) {
     cout << "Random seed: " << RandomInit() << endl;
 
     cout << "Checking Simple ranges" << endl;

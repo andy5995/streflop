@@ -24,7 +24,7 @@ sse_defs = ['-DSTREFLOP_SSE']
 x87_flags = ['-mfpmath=387']
 x87_defs = ['-DSTREFLOP_X87']
 soft_defs = ['-DSTREFLOP_SOFT']
-denormals_def = ['-DSTREFLOP_NO_DENORMALS']
+no_denormals_def = ['-DSTREFLOP_NO_DENORMALS']
 flags = []
 fpu_def = []
 fpu_opt = get_option('fpu')
@@ -41,33 +41,72 @@ if fpu_opt == 'soft'
 endif
 denormals = get_option('denormals')
 if denormals
-  denormals_def = []
+  no_denormals_def = []
 endif
 lib_args += cxx.get_supported_arguments([flags])
-lib_args += [fpu_def, denormals_def]
+lib_args += [fpu_def, no_denormals_def]
 
 streflop_configurations = [
-  {'fpu': 'sse', 'suffix': '_' + 'sse', 'flags': sse_flags, 'defs': sse_defs},
   {
     'fpu': 'sse',
+    'denormals': true,
+    'suffix': '_' + 'sse',
+    'flags': sse_flags,
+    'defs': sse_defs,
+  },
+  {
+    'fpu': 'sse',
+    'denormals': false,
     'suffix': '_' + 'sse_nd',
     'flags': sse_flags,
-    'defs': [sse_defs, denormals_def],
+    'defs': [sse_defs, no_denormals_def],
   },
-  {'fpu': 'x87', 'suffix': '_' + 'x87', 'flags': x87_flags, 'defs': x87_defs},
   {
     'fpu': 'x87',
+    'denormals': true,
+    'suffix': '_' + 'x87',
+    'flags': x87_flags,
+    'defs': x87_defs,
+  },
+  {
+    'fpu': 'x87',
+    'denormals': false,
     'suffix': '_' + 'x87_nd',
     'flags': x87_flags,
-    'defs': [x87_defs, denormals_def],
+    'defs': [x87_defs, no_denormals_def],
   },
-  {'fpu': 'soft', 'suffix': '_' + 'soft', 'flags': [], 'defs': soft_defs},
+  {
+    'fpu': 'soft',
+    'denormals': true,
+    'suffix': '_' + 'soft',
+    'flags': [],
+    'defs': soft_defs,
+  },
 ]
+
+if not get_option('build_all')
+  if (fpu_opt == 'none')
+    error('You must choose an fpu or set build_all to true')
+  endif
+  foreach conf : streflop_configurations
+    if conf['fpu'] == fpu_opt and conf['denormals'] == denormals
+      streflop_configurations = [
+        {
+          'fpu': conf['fpu'],
+          'denormals': conf['denormals'],
+          'suffix': conf['suffix'],
+          'flags': conf['flags'],
+          'defs': conf['defs'],
+        },
+      ]
+      break
+    endif
+  endforeach
+endif
 
 _softwrapper_static_libs = []
 foreach conf : streflop_configurations
   if conf['fpu'] == 'soft'
-    sources += 'softfloat/softfloat.cpp'
     configurations = [
       {'defs': ['-DN_SPECIALIZED=32'], 'name': 'SoftFloatWrapperSimple'},
       {'defs': ['-DN_SPECIALIZED=64'], 'name': 'SoftFloatWrapperDouble'},
@@ -76,11 +115,13 @@ foreach conf : streflop_configurations
     foreach softconf : configurations
       _softwrapper_static_libs += static_library(
         softconf['name'],
-        ['SoftFloatWrapper.cpp'],
+        ['SoftFloatWrapper.cpp', 'softfloat/softfloat.cpp'],
         # include_directories: '.',
         cpp_args: [softconf['defs'], conf['defs'], conf['flags']],
       )
     endforeach
+  else
+    _softwrapper_static_libs = []
   endif
 endforeach
 
@@ -113,18 +154,21 @@ foreach conf : streflop_configurations
   i = i + 1
 endforeach
 
-is_subproject = meson.is_subproject()
-
-if is_subproject
-
+streflop_dep = []
+i = 0
+foreach conf : streflop_configurations
   # How to use in a superproject and other info
   # https://mesonbuild.com/Subprojects.html
-  streflop_dep = declare_dependency(
-    link_with: streflop_ng,
+  streflop_dep += declare_dependency(
+    link_with: streflop_ng[i],
     include_directories: '.',
-    compile_args: [fpu_def, denormals_def],
+    compile_args: [conf['defs']],
   )
-else
+  i = i + 1
+endforeach
+
+is_subproject = meson.is_subproject()
+if not is_subproject
   subdir('tests')
 
   i = 0
@@ -140,7 +184,7 @@ else
       streflop_ng[i],
       description: desc,
       url: 'https://github.com/andy5995/streflop-ng',
-      extra_cflags: [conf['defs'], denormals_def],
+      extra_cflags: [conf['defs'], no_denormals_def],
     )
     i = i + 1
   endforeach

@@ -51,17 +51,21 @@ ldbl96_sources = [
 
 _ldbl96_lib = []
 foreach conf : streflop_configurations
-  _ldbl96_lib += static_library(
-    'ldbl96' + conf['suffix'],
-    ldbl96_sources,
-    cpp_args: [
-      '-Wno-narrowing',
-      '-DLIBM_COMPILING_LDBL96',
-      conf['flags'],
-      conf['defs'],
-    ],
-    include_directories: ['../headers', incdir],
-    pic: true,
-  )
+  if conf['fpu'] != 'sse'
+    _ldbl96_lib += static_library(
+      'ldbl96' + conf['suffix'],
+      ldbl96_sources,
+      cpp_args: [
+        '-Wno-narrowing',
+        '-DLIBM_COMPILING_LDBL96',
+        conf['flags'],
+        conf['defs'],
+      ],
+      include_directories: ['../headers', incdir],
+      pic: true,
+    )
+  else
+    _ldbl96_lib += []
+  endif
 endforeach
 

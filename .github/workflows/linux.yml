@@ -42,10 +42,9 @@ jobs:
 
       - name: Build
         run: |
-          meson setup _build -Dfpu=sse
+          meson setup _build -Dbuild_all=true
           meson compile -C _build
 
-      #- name: Test
-        #run: |
-          ## Other tests need help
-          ## https://github.com/andy5995/streflop/issues/7
+      - name: Test
+        run: |
+          meson test -C _build

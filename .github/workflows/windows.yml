@@ -39,7 +39,7 @@ jobs:
     - name: Build
       run: |
         # meson setup _build -Dfpu=sse -Ddenormals=false
-        meson setup _build -Dfpu=sse
+        meson setup _build -Dbuild_all=true
         meson compile -C _build
 
     - name: Test
