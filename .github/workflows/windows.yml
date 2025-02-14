@@ -36,14 +36,12 @@ jobs:
     - name: Install Python Dependencies
       run: pip install meson ninja
 
-    - name: Build
+    - name: Build and test
       run: |
-        # meson setup _build -Dfpu=sse -Ddenormals=false
-        meson setup _build -Dbuild_all=true
-        meson compile -C _build
-
-    - name: Test
-      run: meson test -v -C _build
+        meson setup _build -Dfpu=sse -Ddenormals=false
+        meson test -v -C _build
+        meson setup --reconfigure _build -Dfpu=soft -Ddenormals=true
+        meson test -v -C _build
 
   #VisualStudio-clang-cl:
     #runs-on: windows-latest
