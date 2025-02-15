@@ -26,9 +26,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [default]
         os: [ubuntu-22.04, ubuntu-24.04]
         cxx: [g++, clang++]
+        include:
+          - os: ubuntu-24.04-arm
+            cxx: g++
+
     runs-on: ${{ matrix.os }}
     env:
       CXX: ${{ matrix.cxx }}
@@ -38,11 +41,12 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update && sudo apt upgrade -y
-          sudo apt install -y --no-install-recommends meson
+          sudo apt install -y --no-install-recommends pip
+          sudo python3 -m pip install meson ninja
 
       - name: Build
         run: |
-          meson setup _build -Dbuild_all=true
+          meson setup _build -Dfpu=all
           meson compile -C _build
 
       - name: Test

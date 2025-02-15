@@ -1,4 +1,3 @@
 # Build options
-option('build_all', type : 'boolean', value: false, description: 'Build all five library targets')
-option('fpu', type : 'combo', choices : ['x87', 'sse', 'soft', 'none'], value : 'none', description: 'FPU')
+option('fpu', type : 'combo', choices : ['x87', 'sse', 'soft', 'all', 'none'], value : 'none', description: 'FPU')
 option('denormals', type: 'boolean', value: false, description: 'denormals')

@@ -1,12 +1,6 @@
 i = 0
 foreach conf : streflop_configurations
-  new_dep = []
-  if build_all
-    new_dep = streflop_dep[i]
-  else
-    new_dep = streflop_dep
-  endif
-
+  new_dep = fpu_opt.contains('all') ? streflop_dep[i] : streflop_dep
   test_execs = [
     #'arithmeticTest',
     'randomTest',
@@ -14,7 +8,7 @@ foreach conf : streflop_configurations
   foreach test : test_execs
     name = test + conf['suffix']
     exe = executable(name, [test + '.cpp'], dependencies: new_dep)
-    test(name, exe, timeout: 120)
+    test(name, exe, timeout: 180)
   endforeach
   i = i + 1
 endforeach

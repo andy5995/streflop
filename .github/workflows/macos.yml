@@ -1,0 +1,40 @@
+name: MacOS
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/macos.yml'
+  pull_request:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/macos.yml'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install meson
+
+      - name: sse_nd
+        run: |
+          meson setup _build -Dfpu=sse -Ddenormals=false
+          meson compile -C _build
+
+      - name: Test
+        run: |
+          meson test -C _build

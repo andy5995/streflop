@@ -1,5 +1,7 @@
 [![Linux CI](https://github.com/andy5995/streflop/actions/workflows/linux.yml/badge.svg?branch=trunk)](https://github.com/andy5995/streflop/actions/workflows/linux.yml)
-
+[![MacOS](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml)
+[![Windows](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml)
+[![FreeBSD](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml)
 
 # STandalone REproducible FLOating-Point library
 
@@ -15,6 +17,38 @@ This fork maintained by [Andy Alt](https://github.com/andy5995)
 For a quick setup guide, see the "usage" sections below.
 
 
+## Building
+
+### Custom Build Configurations
+
+`streflop-ng` supports multiple floating-point unit (FPU) configurations. You
+can specify them when setting up the build:
+
+```sh
+meson setup builddir -Dfpu=sse -Ddenormals=false
+```
+
+Available options for `-Dfpu`:
+- 'all'
+- `x87`
+- `sse`
+- `soft`
+
+To build all configurations:
+```sh
+meson setup builddir -Dfpu=all
+cd builddir
+ninja
+```
+
+### Running Tests
+To run the test suite:
+```sh
+meson test
+```
+
+For further details, refer to the [Meson
+documentation](https://mesonbuild.com/).
 
 ## Presentation:
 

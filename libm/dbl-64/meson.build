@@ -86,7 +86,7 @@ _dbl64_lib = []
 foreach conf : streflop_configurations
   _dbl64_lib += static_library(
     'dbl64' + conf['suffix'],
-    dbl64_sources,
+    [dbl64_sources],
     cpp_args: [
       '-Wno-narrowing',
       '-DLIBM_COMPILING_DBL64=1',

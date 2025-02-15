@@ -50,12 +50,11 @@ ldbl96_sources = [
 ]
 
 _ldbl96_lib = []
-i = 0
 foreach conf : streflop_configurations
   if conf['fpu'] != 'sse'
     _ldbl96_lib += static_library(
       'ldbl96' + conf['suffix'],
-      ldbl96_sources,
+      [ldbl96_sources],
       cpp_args: [
         '-Wno-narrowing',
         '-DLIBM_COMPILING_LDBL96',
@@ -65,9 +64,6 @@ foreach conf : streflop_configurations
       include_directories: ['../headers', incdir],
       pic: true,
     )
-  else
-    _ldbl96_lib += []
   endif
-  i = i + 1
 endforeach
 
