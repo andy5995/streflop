@@ -68,8 +68,6 @@ A related but more general problem is random number generation, often necessary 
 
 May not return the same x across different FPUs / systems / compilers / etc.
 
-```
-
 These problems are related to:
 
 - Some FPU (like x87 on Linux) keep by default an internal precision (80 bits) larger than the type size in memory. In the first example, if x is on the stack but y in a register, the comparison will fail. Worse, whether x and/or y is on the stack or register depends on what you put in the ... section. This problem can be solved by restricting the internal FPU precision to the type size in memory. Unfortunately, on x87, some operations like the transcendental functions are always computed on 80 bits...
@@ -116,27 +114,39 @@ Usage (programming):
 
 Usage (standalone build):
 
-- Edit Makefile.common to configure which FPU/denormal setup you choose, by defining one of STREFLOP_SSE, STREFLOP_X87, STREFLOP_SOFT, and optionally STREFLOP_NO_DENORMALS. See the configurations grid below.
-
 - If you're using the software floating-point implementation on a big-endian machine, change the System.h file accordingly. If your target system size has a char type larger than 8 bits, then check Integer.h. In both cases you're on your own (this is untested).
 
 - Check the notes below before changing the compiler options.
 
 
 
-Usage (including in a project):
+## Usage (including in a project):
 
-- Copy the whole streflop source somewhere in your project, for example as a "streflop" subdirectory.
+See the [Meson wrap dependency
+manual](https://mesonbuild.com/Wrap-dependency-system-manual.html#wrap-dependency-system-manual)
 
-- Check the steps for the standalone build. Potentially automate the choices using your build system, like autoconf.
+### Example
 
-- Call "make -C streflop" somewhere in you own build process, or integrate the streflop build in your build system.
+```meson
+streflop_subproj = subproject(
+  'streflop-ng',
+  default_options: ['default_library=static', 'fpu=sse', 'denormals=false'],
+)
+streflop_dep = streflop_subproj.get_variable('streflop_dep')
+```
 
-- See the programming usage above. Don't forget to "-Istreflop" and "-Lstreflop -lstreflop.a" when compiling and linking.
+If streflop is installed on the target system, you can use
 
+    streflop_dep = dependency('streflop-ng_sse_nd')
 
+Other available dependency names are:
 
-Configurations grid:
+* streflop-ng_sse
+* streflop-ng_x87_nd
+* streflop-ng_x87
+* streflop-ng_soft
+
+## Configurations grid
 
             |   SSE   |   x87     |   Soft   |
 ------------+---------+-----------+----------+
@@ -178,7 +188,7 @@ Comparison criteria:
 
 
 
-Notes:
+## Notes:
 
 - Beware of too aggressive optimization options! In particular, since this code relies on reinterpret_cast and unions, the compiler must not assume strict aliasing. For g++ optimization levels 2 and 3, this assumption is unfortunately the default. Similarly, the compiler should not assume that NaN can be ignored, or that the FPU has a constant rounding mode. Ex: -O3 -fno-strict-aliasing -frounding-math -fsignaling-nans.
 
@@ -252,5 +262,3 @@ How you can help:
 - Port the library to new FPU and operating systems.
 
 - Help extend the GNU libm first, and only then import that work in this project.
-
-```
