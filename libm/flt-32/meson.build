@@ -72,7 +72,7 @@ foreach conf : streflop_configurations
     'flt32' + conf['suffix'],
     flt32_sources,
     cpp_args: ['-DLIBM_COMPILING_FLT32', conf['flags'], conf['defs']],
-    include_directories: [incdir, '../headers'],
+    include_directories: [inc_dirs],
     pic: true,
   )
 endforeach

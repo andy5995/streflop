@@ -61,7 +61,7 @@ foreach conf : streflop_configurations
         conf['flags'],
         conf['defs'],
       ],
-      include_directories: ['../headers', incdir],
+      include_directories: [inc_dirs],
       pic: true,
     )
   endif

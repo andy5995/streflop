@@ -30,6 +30,8 @@ soft_defs = ['-DSTREFLOP_SOFT']
 sse_defs = ['-DSTREFLOP_SSE']
 x87_defs = ['-DSTREFLOP_X87']
 
+h_subdir = 'meson.project_name()'
+
 streflop_configurations = [
   {
     'fpu': 'soft',
@@ -100,7 +102,7 @@ if fpu_opt != 'all'
   endforeach
 endif
 
-incdir = include_directories('libm')
+inc_dirs = include_directories('libm', 'libm/headers')
 
 subdir('libm')
 
@@ -127,7 +129,6 @@ foreach conf : streflop_configurations
       _softwrapper_static_libs += static_library(
         softconf['name'],
         ['SoftFloatWrapper.cpp'],
-        # include_directories: '.',
         cpp_args: [softconf['defs'], conf['defs'], conf['flags']],
       )
     endforeach
@@ -137,7 +138,6 @@ foreach conf : streflop_configurations
     meson.project_name() + conf['suffix'],
     ['Math.cpp', 'Random.cpp', _soft_src],
     version: meson.project_version(),
-    include_directories: incdir,
     cpp_args: [conf['flags'], conf['defs']],
     link_with: [
       _flt32_lib[i],
@@ -158,13 +158,10 @@ i = 0
 foreach conf : streflop_configurations
   # How to use in a superproject and other info
   # https://mesonbuild.com/Subprojects.html
-  merged = conf['defs'] + conf['flags']
-  cpp_args = ' '.join(merged)
-  message('cpp_args: ' + cpp_args)
   streflop_dep += declare_dependency(
     link_with: streflop_ng[i],
     include_directories: include_directories('.'),
-    compile_args: [conf['defs'], conf['flags']]
+    compile_args: [conf['defs'], conf['flags']],
   )
   i = i + 1
 endforeach
@@ -182,33 +179,22 @@ if not is_subproject
     denorm_state = conf['denormals'] ? 'denormals' : 'no denormals'
     desc = 'STREFLOP library [' + conf['fpu'] + '] [' + denorm_state + ']'
     pkg = import('pkgconfig')
-    cpp_args = ' '.join(conf['defs'])
     pkg.generate(
       streflop_ng[i],
       description: desc,
+      subdirs: h_subdir,
       url: 'https://github.com/andy5995/streflop-ng',
-      extra_cflags: cpp_args,
+      extra_cflags: [conf['defs'], conf['flags']],
     )
     i = i + 1
   endforeach
 endif
 
-# TODO: Installation of libraries, headers and docs
-#
-#headers = [
-#  'FPUSettings.h',
-#  'IntegerTypes.h',
-#  'Math.h',
-#  'Random.h',
-#  'SoftFloatWrapper.h',
-#  'streflop.h',
-#  'System.h',
-#  'X87DenormalSquasher.h',
-#]
+if not meson.is_subproject()
+  install_headers(
+    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
+    subdir: h_subdir,
+  )
+endif
 
-#if not meson.is_subproject()
-#  install_headers(
-#    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
-#    subdir: 'streflop',
-#  )
-#endif
+install_data(files('LGPL.txt', 'README.md'), install_dir: get_option('docdir'))

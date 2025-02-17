@@ -1,11 +1,11 @@
-libm_src = files(['e_expf.cpp', 'w_expf.cpp'])
+libm_src = files('e_expf.cpp', 'w_expf.cpp')
 _libm_static_libs = []
 
 foreach conf : streflop_configurations
   _libm_static_libs += static_library(
     'libm' + conf['suffix'],
     ['e_expf.cpp', 'w_expf.cpp'],
-    include_directories: ['headers', incdir],
+    include_directories: [inc_dirs],
     cpp_args: ['-DLIBM_COMPILING_FLT32', conf['flags'], conf['defs']],
     pic: true,
   )
@@ -27,7 +27,7 @@ endforeach
 #      libmconf['name'] + conf['suffix'],
 #      libm_src,
 #      cpp_args: [libmconf['defs'], conf['defs'], conf['flags']],
-#      include_directories: [incdir, 'headers'],
+#      include_directories: [inc_dirs, 'headers'],
 #    )
 #  endforeach
 #  _libm_static_libs += _libm_objects

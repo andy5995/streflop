@@ -32,6 +32,8 @@ jobs:
       uses: vmactions/freebsd-vm@v1
       with:
         usesh: true
+        prepare: |
+          pkg install -y meson
         run: |
           meson setup _build -Dfpu=all
           meson compile -C _build

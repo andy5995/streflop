@@ -10,10 +10,6 @@
     Please read the history and copyright information in the documentation provided with the source code
 */
 
-// This fails the meson test when built with SOFT, so it's
-// disabled for now... -andy5995 / 2025-02-11
-#if (!defined STREFLOP_SOFT)
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -156,11 +152,3 @@ int main(void) {
 
     return 0;
 }
-
-#else
-
-int main(void) {
-    return 0;
-}
-#endif
-
