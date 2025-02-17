@@ -1,5 +1,7 @@
 [![Linux CI](https://github.com/andy5995/streflop/actions/workflows/linux.yml/badge.svg?branch=trunk)](https://github.com/andy5995/streflop/actions/workflows/linux.yml)
-
+[![MacOS](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml)
+[![Windows](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml)
+[![FreeBSD](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml)
 
 # STandalone REproducible FLOating-Point library
 
@@ -15,6 +17,38 @@ This fork maintained by [Andy Alt](https://github.com/andy5995)
 For a quick setup guide, see the "usage" sections below.
 
 
+## Building
+
+### Custom Build Configurations
+
+`streflop-ng` supports multiple floating-point unit (FPU) configurations. You
+can specify them when setting up the build:
+
+```sh
+meson setup builddir -Dfpu=sse -Ddenormals=false
+```
+
+Available options for `-Dfpu`:
+- 'all'
+- `x87`
+- `sse`
+- `soft`
+
+To build all configurations:
+```sh
+meson setup builddir -Dfpu=all
+cd builddir
+ninja
+```
+
+### Running Tests
+To run the test suite:
+```sh
+meson test
+```
+
+For further details, refer to the [Meson
+documentation](https://mesonbuild.com/).
 
 ## Presentation:
 
@@ -33,8 +67,6 @@ A related but more general problem is random number generation, often necessary 
     double x = random_number();
 
 May not return the same x across different FPUs / systems / compilers / etc.
-
-```
 
 These problems are related to:
 
@@ -82,38 +114,50 @@ Usage (programming):
 
 Usage (standalone build):
 
-- Edit Makefile.common to configure which FPU/denormal setup you choose, by defining one of STREFLOP_SSE, STREFLOP_X87, STREFLOP_SOFT, and optionally STREFLOP_NO_DENORMALS. See the configurations grid below.
-
 - If you're using the software floating-point implementation on a big-endian machine, change the System.h file accordingly. If your target system size has a char type larger than 8 bits, then check Integer.h. In both cases you're on your own (this is untested).
 
 - Check the notes below before changing the compiler options.
 
 
 
-Usage (including in a project):
+## Usage (including in a project):
 
-- Copy the whole streflop source somewhere in your project, for example as a "streflop" subdirectory.
+See the [Meson wrap dependency
+manual](https://mesonbuild.com/Wrap-dependency-system-manual.html#wrap-dependency-system-manual)
 
-- Check the steps for the standalone build. Potentially automate the choices using your build system, like autoconf.
+### Example
 
-- Call "make -C streflop" somewhere in you own build process, or integrate the streflop build in your build system.
+```meson
+streflop_subproj = subproject(
+  'streflop-ng',
+  default_options: ['default_library=static', 'fpu=sse', 'denormals=false'],
+)
+streflop_dep = streflop_subproj.get_variable('streflop_dep')
+```
 
-- See the programming usage above. Don't forget to "-Istreflop" and "-Lstreflop -lstreflop.a" when compiling and linking.
+If streflop is installed on the target system, you can use
 
+    streflop_dep = dependency('streflop-ng_sse_nd')
 
+Other available dependency names are:
 
-Configurations grid:
+* streflop-ng_sse
+* streflop-ng_x87_nd
+* streflop-ng_x87
+* streflop-ng_soft
 
-            |   SSE   |   x87     |   Soft   |
-------------+---------+-----------+----------+
-denormals   | Simple *| Simple   *| Simple   |
-            | Double *| Double   *| Double   |
-            |         | Extended *| Extended |
-------------+---------+-----------+----------+
-no denormal | Simple *| Simple    |
-            | Double *| Double    |
-            |         | Extended  |
-------------+---------+-----------+
+## Configurations grid
+
+|                |   SSE      |   x87        |   Soft       |
+| :------------: | :--------: | :----------: | :----------: |
+| denormals      | Simple     | Simple       | Simple       |
+|                | Double     | Double       | Double       |
+|                |            | Extended     | Extended     |
+| :------------: | :--------: | :----------: | :----------: |
+| no denormal    | Simple     | Simple       |              |
+|                | Double     | Double       |              |
+|                |            | Extended     |              |
+
 
 One cell in this grid must be selected at configure time. All types within that cell are then available at compile and run time.
 Types marked * are aliases to the native float/double/long double, with support by FPU flags.
@@ -144,7 +188,7 @@ Comparison criteria:
 
 
 
-Notes:
+## Notes:
 
 - Beware of too aggressive optimization options! In particular, since this code relies on reinterpret_cast and unions, the compiler must not assume strict aliasing. For g++ optimization levels 2 and 3, this assumption is unfortunately the default. Similarly, the compiler should not assume that NaN can be ignored, or that the FPU has a constant rounding mode. Ex: -O3 -fno-strict-aliasing -frounding-math -fsignaling-nans.
 
@@ -218,5 +262,3 @@ How you can help:
 - Port the library to new FPU and operating systems.
 
 - Help extend the GNU libm first, and only then import that work in this project.
-
-```

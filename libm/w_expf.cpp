@@ -6,5 +6,5 @@
 #include "math_private.h"
 
 float __expf(float x) {
-    return __ieee754_expf(x);
+    return streflop_libm::__ieee754_expf(x);
 }

@@ -1,0 +1,41 @@
+name: FreeBSD
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  push:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/freebsd.yml'
+  pull_request:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/freebsd.yml'
+
+jobs:
+  freebsd:
+    runs-on: ubuntu-latest
+    name: FreeBSD
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test in FreeBSD
+      id: test
+      uses: vmactions/freebsd-vm@v1
+      with:
+        usesh: true
+        prepare: |
+          pkg install -y meson
+        run: |
+          meson setup _build -Dfpu=sse -Ddenormals=false
+          meson test -v -C _build
+          meson setup --reconfigure _build -Dfpu=sse -Ddenormals=true
+          meson test -v -C _build

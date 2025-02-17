@@ -4,5 +4,9 @@
 
 libm/flt-target
 libm/dbl-target
+libm/ldbl-target
 arithmeticTest-sse-nd
 randomTest-sse-nd
+*.bin
+randomTest-soft
+arithmeticTest-soft

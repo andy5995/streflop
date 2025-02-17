@@ -1,0 +1,74 @@
+name: Windows
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  #workflow_run:
+    #workflows: [Linux CI]
+    #types: [completed]
+  push:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/windows.yml'
+  pull_request:
+    branches: [ trunk ]
+    paths:
+    - '**'
+    - '!**.yml'
+    - '**/windows.yml'
+
+jobs:
+  build-win64:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Python Dependencies
+      run: pip install meson ninja
+
+    - name: sse_nd
+      run: |
+        meson setup _build -Dfpu=sse -Ddenormals=false
+        meson test -v -C _build
+
+    - name: sse
+      run: |
+        meson setup --reconfigure _build -Dfpu=sse -Ddenormals=true
+        meson test -v -C _build
+
+    - name: sse_nd
+      run: |
+        meson setup --reconfigure _build -Dfpu=x87 -Ddenormals=false
+        meson test -v -C _build
+
+  #VisualStudio-clang-cl:
+    #runs-on: windows-latest
+    #env:
+      #CC: clang-cl
+      #CXX: clang-cl
+    #steps:
+    #- uses: actions/checkout@v4
+
+    #- name: Install packages
+      #run: |
+        #python -m pip install meson
+
+    #- uses: ilammy/msvc-dev-cmd@v1
+
+    #- name: sse_nd
+      #run: |
+        #meson setup _build -Dfpu=sse -Ddenormals=false
+        #meson test -v -C _build
