@@ -110,6 +110,12 @@ streflop_ng = []
 i = 0
 ldbl96_i = 0
 foreach conf : streflop_configurations
+# This was in the original streflop Makefile:
+#
+# ifndef STREFLOP_SSE
+# TARGETS += libm/ldbl-target
+# LIBM_OBJECTS += $(ldbl-96-objects)
+# endif
   ldbl96_lib = []
   if conf['fpu'] != 'sse'
     ldbl96_lib = _ldbl96_lib[ldbl96_i]
