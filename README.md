@@ -148,16 +148,18 @@ Other available dependency names are:
 
 ## Configurations grid
 
-|                |   SSE      |   x87        |   Soft       |
-| :------------: | :--------: | :----------: | :----------: |
-| denormals      | Simple     | Simple       | Simple       |
-|                | Double     | Double       | Double       |
-|                |            | Extended     | Extended     |
-| :------------: | :--------: | :----------: | :----------: |
-| no denormal    | Simple     | Simple       |              |
-|                | Double     | Double       |              |
-|                |            | Extended     |              |
-
+```
+            |   SSE   |   x87     |   Soft   |
+------------+---------+-----------+----------+
+denormals   | Simple *| Simple   *| Simple   |
+            | Double *| Double   *| Double   |
+            |         | Extended *| Extended |
+------------+---------+-----------+----------+
+no denormal | Simple *| Simple    |
+            | Double *| Double    |
+            |         | Extended  |
+------------+---------+-----------+
+```
 
 One cell in this grid must be selected at configure time. All types within that cell are then available at compile and run time.
 Types marked * are aliases to the native float/double/long double, with support by FPU flags.
