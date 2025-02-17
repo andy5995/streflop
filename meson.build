@@ -197,4 +197,8 @@ if not meson.is_subproject()
   )
 endif
 
-install_data(files('LGPL.txt', 'README.md'), install_dir: get_option('docdir'))
+install_data(
+  ['LGPL.txt', 'README.md', 'libm/README.txt'],
+  preserve_path: true,
+  install_dir: get_option('docdir'),
+)
