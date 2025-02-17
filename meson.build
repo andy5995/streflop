@@ -30,7 +30,7 @@ soft_defs = ['-DSTREFLOP_SOFT']
 sse_defs = ['-DSTREFLOP_SSE']
 x87_defs = ['-DSTREFLOP_X87']
 
-h_subdir = 'meson.project_name()'
+h_subdir = meson.project_name()
 
 streflop_configurations = [
   {
