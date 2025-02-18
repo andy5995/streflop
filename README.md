@@ -2,6 +2,7 @@
 [![MacOS](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/macos.yml)
 [![Windows](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/windows.yml)
 [![FreeBSD](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/freebsd.yml)
+[![CodeQL Advanced](https://github.com/andy5995/streflop-ng/actions/workflows/codeql.yml/badge.svg)](https://github.com/andy5995/streflop-ng/actions/workflows/codeql.yml)
 
 # STandalone REproducible FLOating-Point library
 
