@@ -145,11 +145,11 @@ foreach conf : streflop_configurations
     ['Math.cpp', 'Random.cpp', _soft_src],
     version: meson.project_version(),
     cpp_args: [conf['flags'], conf['defs']],
-    link_with: [
+    link_whole: [
       _flt32_lib[i],
       _dbl64_lib[i],
       ldbl96_lib,
-      _libm_static_libs[i],
+      #_libm_static_libs[i],
       _softwrapper_static_libs,
     ],
     # install: not meson.is_subproject(),
