@@ -18,6 +18,7 @@ extra_flags = [
   '-fsignaling-nans',
   '-fno-strict-aliasing',
   '-mieee-fp',
+  '-pipe',
 ]
 
 add_project_arguments(cxx.get_supported_arguments(extra_flags), language: 'cpp')
@@ -102,20 +103,22 @@ if fpu_opt != 'all'
   endforeach
 endif
 
-inc_dirs = include_directories('libm', 'libm/headers')
+inc_dirs = include_directories('libm/headers')
 
-subdir('libm')
+subdir('libm/flt-32')
+subdir('libm/dbl-64')
+subdir('libm/ldbl-96')
 
 streflop_ng = []
 i = 0
 ldbl96_i = 0
 foreach conf : streflop_configurations
-# This was in the original streflop Makefile:
-#
-# ifndef STREFLOP_SSE
-# TARGETS += libm/ldbl-target
-# LIBM_OBJECTS += $(ldbl-96-objects)
-# endif
+  # This was in the original streflop Makefile:
+  #
+  # ifndef STREFLOP_SSE
+  # TARGETS += libm/ldbl-target
+  # LIBM_OBJECTS += $(ldbl-96-objects)
+  # endif
   ldbl96_lib = []
   if conf['fpu'] != 'sse'
     ldbl96_lib = _ldbl96_lib[ldbl96_i]
@@ -136,25 +139,38 @@ foreach conf : streflop_configurations
         softconf['name'],
         ['SoftFloatWrapper.cpp'],
         cpp_args: [softconf['defs'], conf['defs'], conf['flags']],
+        build_by_default: false,
       )
     endforeach
   endif
 
+  _part_lib = static_library(
+    'partial' + meson.project_name() + conf['suffix'],
+    ['SMath.cpp', 'Random.cpp'],
+    cpp_args: [conf['flags'], conf['defs']],
+    pic: true,
+    build_by_default: false,
+  )
+
   streflop_ng += library(
     meson.project_name() + conf['suffix'],
-    ['Math.cpp', 'Random.cpp', _soft_src],
+    [_soft_src],
     version: meson.project_version(),
     cpp_args: [conf['flags'], conf['defs']],
     link_whole: [
-      _flt32_lib[i],
-      _dbl64_lib[i],
-      ldbl96_lib,
-      #_libm_static_libs[i],
-      _softwrapper_static_libs,
+      #_flt32_lib[i],
+      #_dbl64_lib[i],
+      #ldbl96_lib,
+      #_softwrapper_static_libs
+],
+    objects: [
+      _flt32_lib[i].extract_all_objects(),
+      _dbl64_lib[i].extract_all_objects(),
+      ldbl96_lib.extract_all_objects(),
+      _part_lib.extract_all_objects(),
     ],
     # install: not meson.is_subproject(),
     install: false,
-    pic: true,
   )
   i = i + 1
 endforeach
@@ -198,7 +214,7 @@ endif
 
 if not meson.is_subproject()
   install_headers(
-    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
+    ['FPUSettings.h', 'SMath.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
     subdir: h_subdir,
   )
 endif

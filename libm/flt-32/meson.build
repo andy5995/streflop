@@ -74,5 +74,6 @@ foreach conf : streflop_configurations
     cpp_args: ['-DLIBM_COMPILING_FLT32', conf['flags'], conf['defs']],
     include_directories: [inc_dirs],
     pic: true,
+    build_by_default: false,
   )
 endforeach

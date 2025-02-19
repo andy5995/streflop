@@ -1,11 +1,9 @@
 i = 0
 foreach conf : streflop_configurations
   new_dep = fpu_opt.contains('all') ? streflop_dep[i] : streflop_dep
-  test_execs = [
-    'arithmeticTest',
-]
+  test_execs = ['arithmeticTest']
   if conf['fpu'] != 'soft'
-  #  test_execs += 'randomTest'
+    #  test_execs += 'randomTest'
   endif
   foreach test : test_execs
     name = test + conf['suffix']

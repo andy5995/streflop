@@ -95,5 +95,6 @@ foreach conf : streflop_configurations
     ],
     include_directories: [inc_dirs],
     pic: true,
+    build_by_default: false,
   )
 endforeach
