@@ -61,14 +61,13 @@ foreach conf : streflop_configurations
       'ldbl96' + conf['suffix'],
       [ldbl96_sources],
       cpp_args: [
-        #'-Wno-narrowing',
+        extra_flags,
+        '-Wno-narrowing',
         '-DLIBM_COMPILING_LDBL96',
         conf['flags'],
         conf['defs'],
       ],
       include_directories: [inc_dirs],
-      pic: true,
-      build_by_default: false,
     )
   endif
 endforeach

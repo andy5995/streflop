@@ -88,13 +88,12 @@ foreach conf : streflop_configurations
     'dbl64' + conf['suffix'],
     [dbl64_sources],
     cpp_args: [
+      extra_flags,
       '-Wno-narrowing',
       '-DLIBM_COMPILING_DBL64=1',
       conf['flags'],
       conf['defs'],
     ],
     include_directories: [inc_dirs],
-    pic: true,
-    build_by_default: false,
   )
 endforeach
