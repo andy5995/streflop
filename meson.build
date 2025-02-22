@@ -3,7 +3,7 @@ project(
   ['cpp'],
   default_options: ['cpp_std=c++11', 'warning_level=2', 'b_staticpic=true'],
   version: '0.3.05',
-  meson_version: '>= 0.63.0',
+  meson_version: '>= 0.64.0',
 )
 
 # The current required meson version of 0.63.0 is to prevent this error:
@@ -101,6 +101,9 @@ if fpu_opt != 'all'
       break
     endif
   endforeach
+  if streflop_configurations.length() != 1
+    error('Requested fpu/denormals combination not available')
+  endif
 endif
 
 inc_dirs = include_directories('libm/headers')
@@ -144,19 +147,18 @@ foreach conf : streflop_configurations
     endforeach
   endif
 
-  streflop_ng += static_library(
+  streflop_ng += library(
     meson.project_name() + conf['suffix'],
     ['SMath.cpp', 'Random.cpp', _soft_src],
     #version: meson.project_version(),
     cpp_args: [conf['flags'], conf['defs']],
-    link_with: [
+    link_whole: [
       _flt32_lib[i],
       _dbl64_lib[i],
       ldbl96_lib,
       _softwrapper_static_libs,
     ],
-    # install: not meson.is_subproject(),
-    install: false,
+    install: not meson.is_subproject(),
   )
   i = i + 1
 endforeach

@@ -7,4 +7,4 @@ if [ -z "$MESON_CURRENT_BUILD_DIR" ]; then
 fi
 
 cd "$MESON_CURRENT_BUILD_DIR"
-$1 --warn --check "$MESON_CURRENT_SOURCE_DIR/$MESON_TEST.md5"
+md5sum --warn --check "$MESON_CURRENT_SOURCE_DIR/$MESON_TEST.md5"

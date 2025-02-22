@@ -68,6 +68,7 @@ foreach conf : streflop_configurations
         conf['defs'],
       ],
       include_directories: [inc_dirs],
+      build_by_default:false,
     )
   endif
 endforeach

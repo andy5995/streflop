@@ -1,4 +1,7 @@
-md5sum = find_program('md5sum')
+md5sum = []
+if host_machine.system() != 'windows'
+  md5sum = find_program('md5sum')
+endif
 
 i = 0
 foreach conf : streflop_configurations
@@ -24,7 +27,8 @@ foreach conf : streflop_configurations
           'MESON_CURRENT_SOURCE_DIR=' + meson.current_source_dir(),
           'MESON_TEST=' + name,
         ],
-        args: md5sum,
+#         This is only supported by meson 1.6.0
+#         args: md5sum,
         is_parallel: false,
       )
     endif
