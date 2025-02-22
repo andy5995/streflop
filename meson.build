@@ -2,7 +2,7 @@ project(
   'streflop-ng',
   ['cpp'],
   default_options: ['cpp_std=c++11', 'warning_level=2', 'b_staticpic=true'],
-  version: '0.3.05',
+  version: '0.3.1',
   meson_version: '>= 0.64.0',
 )
 # The current required meson version of 0.63.0 is to prevent this error:
@@ -213,7 +213,18 @@ if not meson.is_subproject()
 endif
 
 install_data(
-  ['LICENSE', 'README.md', 'libm/README.txt', 'ChangeLog'],
+  [
+    'LICENSE',
+    'README.md',
+    'libm/README.txt',
+    'libm/README.txt',
+    'softfloat/README.txt',
+    'softfloat/SoftFloat-history.txt',
+    'softfloat/SoftFloat.txt',
+    'SoftFloat-source.txt',
+    'SoftFloat-README.txt',
+    'ChangeLog',
+  ],
   preserve_path: true,
   install_dir: get_option('docdir'),
 )

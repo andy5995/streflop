@@ -6,7 +6,7 @@
 
 # STandalone REproducible FLOating-Point library
 
-Version 0.3.05 (development, 0.3.1 release TBD)
+Version 0.3.1
 
 website: https://github.com/andy5995/streflop-ng
 

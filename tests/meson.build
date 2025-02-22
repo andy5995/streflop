@@ -18,7 +18,7 @@ foreach conf : streflop_configurations
       args = join_paths(meson.current_build_dir(), name)
     endif
     test(name, exe, args: args, timeout: 360)
-    if host_sys != 'windows' # TODO: Replace md5sum-wrapper.sh with a python script
+    if host_sys != 'windows'  # TODO: Replace md5sum-wrapper.sh with a python script
       if test == 'arithmeticTest' and md5sum.found()
         test(
           '-md5sum_' + name,

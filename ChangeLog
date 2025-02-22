@@ -1,0 +1,6 @@
+Sat Feb 22 05:00:00 UTC 2025
+
+- streflop-ng 0.3.1:
+  + Add meson build system
+  + Generate .pc files (using meson)
+  * Apply patches from https://github.com/fzn7/streflop/tree/master/patches
