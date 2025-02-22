@@ -49,6 +49,11 @@ ldbl96_sources = [
   'w_expl.cpp',
 ]
 
+foreach conf : streflop_configurations
+  message('conf:')
+  message(conf)
+endforeach
+
 _ldbl96_lib = []
 foreach conf : streflop_configurations
   if conf['fpu'] != 'sse'
@@ -56,13 +61,13 @@ foreach conf : streflop_configurations
       'ldbl96' + conf['suffix'],
       [ldbl96_sources],
       cpp_args: [
+        extra_flags,
         '-Wno-narrowing',
         '-DLIBM_COMPILING_LDBL96',
         conf['flags'],
         conf['defs'],
       ],
       include_directories: [inc_dirs],
-      pic: true,
     )
   endif
 endforeach

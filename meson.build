@@ -1,7 +1,7 @@
 project(
   'streflop-ng',
   ['cpp'],
-  default_options: ['cpp_std=c++11', 'warning_level=2'],
+  default_options: ['cpp_std=c++11', 'warning_level=2', 'b_staticpic=true'],
   version: '0.3.05',
   meson_version: '>= 0.63.0',
 )
@@ -18,9 +18,10 @@ extra_flags = [
   '-fsignaling-nans',
   '-fno-strict-aliasing',
   '-mieee-fp',
+  '-pipe',
 ]
 
-add_project_arguments(cxx.get_supported_arguments(extra_flags), language: 'cpp')
+extra_flags = cxx.get_supported_arguments(extra_flags)
 
 fpu_opt = get_option('fpu')
 denormals = get_option('denormals')
@@ -36,7 +37,7 @@ streflop_configurations = [
   {
     'fpu': 'soft',
     'denormals': true,
-    'suffix': '_' + 'soft',
+    'suffix': '-' + 'soft',
     'flags': [],
     'defs': soft_defs,
   },
@@ -48,14 +49,14 @@ if sse_flags != []
     {
       'fpu': 'sse',
       'denormals': true,
-      'suffix': '_' + 'sse',
+      'suffix': '-' + 'sse',
       'flags': sse_flags,
       'defs': sse_defs,
     },
     {
       'fpu': 'sse',
       'denormals': false,
-      'suffix': '_' + 'sse_nd',
+      'suffix': '-' + 'sse-nd',
       'flags': sse_flags,
       'defs': [sse_defs, no_denormals_def],
     },
@@ -68,14 +69,14 @@ if x87_flags != []
     {
       'fpu': 'x87',
       'denormals': true,
-      'suffix': '_' + 'x87',
+      'suffix': '-' + 'x87',
       'flags': x87_flags,
       'defs': x87_defs,
     },
     {
       'fpu': 'x87',
       'denormals': false,
-      'suffix': '_' + 'x87_nd',
+      'suffix': '-' + 'x87-nd',
       'flags': x87_flags,
       'defs': [x87_defs, no_denormals_def],
     },
@@ -102,20 +103,22 @@ if fpu_opt != 'all'
   endforeach
 endif
 
-inc_dirs = include_directories('libm', 'libm/headers')
+inc_dirs = include_directories('libm/headers')
 
-subdir('libm')
+subdir('libm/flt-32')
+subdir('libm/dbl-64')
+subdir('libm/ldbl-96')
 
 streflop_ng = []
 i = 0
 ldbl96_i = 0
 foreach conf : streflop_configurations
-# This was in the original streflop Makefile:
-#
-# ifndef STREFLOP_SSE
-# TARGETS += libm/ldbl-target
-# LIBM_OBJECTS += $(ldbl-96-objects)
-# endif
+  # This was in the original streflop Makefile:
+  #
+  # ifndef STREFLOP_SSE
+  # TARGETS += libm/ldbl-target
+  # LIBM_OBJECTS += $(ldbl-96-objects)
+  # endif
   ldbl96_lib = []
   if conf['fpu'] != 'sse'
     ldbl96_lib = _ldbl96_lib[ldbl96_i]
@@ -135,26 +138,25 @@ foreach conf : streflop_configurations
       _softwrapper_static_libs += static_library(
         softconf['name'],
         ['SoftFloatWrapper.cpp'],
-        cpp_args: [softconf['defs'], conf['defs'], conf['flags']],
+        cpp_args: [extra_flags, softconf['defs'], conf['defs'], conf['flags']],
+        build_by_default: true,
       )
     endforeach
   endif
 
-  streflop_ng += library(
+  streflop_ng += static_library(
     meson.project_name() + conf['suffix'],
-    ['Math.cpp', 'Random.cpp', _soft_src],
-    version: meson.project_version(),
+    ['SMath.cpp', 'Random.cpp', _soft_src],
+    #version: meson.project_version(),
     cpp_args: [conf['flags'], conf['defs']],
     link_with: [
       _flt32_lib[i],
       _dbl64_lib[i],
       ldbl96_lib,
-      _libm_static_libs[i],
       _softwrapper_static_libs,
     ],
     # install: not meson.is_subproject(),
     install: false,
-    pic: true,
   )
   i = i + 1
 endforeach
@@ -198,7 +200,7 @@ endif
 
 if not meson.is_subproject()
   install_headers(
-    ['FPUSettings.h', 'Math.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
+    ['FPUSettings.h', 'SMath.h', 'Random.h', 'SoftFloatWrapper.h', 'streflop.h'],
     subdir: h_subdir,
   )
 endif
