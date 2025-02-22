@@ -15,9 +15,6 @@ Nicolas Brodu. See also the acknowledgments below.
 
 This fork maintained by [Andy Alt](https://github.com/andy5995)
 
-For a quick setup guide, see the "usage" sections below.
-
-
 ## Building
 
 ### Custom Build Configurations
@@ -35,12 +32,25 @@ Available options for `-Dfpu`:
 - `sse`
 - `soft`
 
+> [!note]
+> Currently 'all' will not succeed due to [issue
+#16](https://github.com/andy5995/streflop-ng/issues/16).
+
 To build all configurations:
 ```sh
 meson setup builddir -Dfpu=all
 cd builddir
 ninja
 ```
+
+> [!note]
+> [x87 won't build](https://github.com/andy5995/streflop-ng/issues/16)
+unless the streflop-ng library is built as static. To build a single static
+library:
+
+    meson setup builddir -Dfpu=x87 -Ddefault_library=static
+
+Or set the option when using as a subproject (see below)
 
 ### Running Tests
 To run the test suite:
@@ -111,22 +121,16 @@ Usage (programming):
 
 - You may have a look at arithmeticTest.cpp and randomTest.cpp for examples.
 
-
-
-Usage (standalone build):
-
-- If you're using the software floating-point implementation on a big-endian machine, change the System.h file accordingly. If your target system size has a char type larger than 8 bits, then check Integer.h. In both cases you're on your own (this is untested).
-
-- Check the notes below before changing the compiler options.
-
-
-
 ## Usage (including in a project):
 
-See the [Meson wrap dependency
-manual](https://mesonbuild.com/Wrap-dependency-system-manual.html#wrap-dependency-system-manual)
+If you're using the software floating-point implementation on a big-endian
+machine, change the System.h file accordingly. If your target system size has
+a char type larger than 8 bits, then check Integer.h. In both cases you're on
+your own (this is untested).
 
-### Example
+Check the notes below before changing the compiler options.
+
+For use as a subproject in Meson:
 
 ```meson
 streflop_subproj = subproject(
@@ -136,16 +140,37 @@ streflop_subproj = subproject(
 streflop_dep = streflop_subproj.get_variable('streflop_dep')
 ```
 
-If streflop is installed on the target system, you can use
+See the [Meson wrap dependency
+manual](https://mesonbuild.com/Wrap-dependency-system-manual.html#wrap-dependency-system-manual)
+for more details and how to create the required wrap file.
 
-    streflop_dep = dependency('streflop-ng_sse_nd')
+If streflop-ng is installed on the target system:
+
+### pkg-config
+
+    pkg-config --cflags --libs streflop-ng-sse-nd
+
+### Meson
+
+    streflop_dep = dependency('streflop-ng-sse-nd')
 
 Other available dependency names are:
 
-* streflop-ng_sse
-* streflop-ng_x87_nd
-* streflop-ng_x87
-* streflop-ng_soft
+* streflop-ng-sse
+* streflop-ng-x87-nd
+* streflop-ng-x87
+* streflop-ng-soft
+
+## Installing
+
+From the build directory, use `meson configure` to see various options you can
+set, such as 'prefix' and 'datadir'. To install:
+
+DESTDIR=$HOME/.local ninja install
+
+Or omit DESTDIR to install to the directories configured by you or by default.
+
+To uninstall, use `ninja uninstall`.
 
 ## Configurations grid
 

@@ -1,6 +1,6 @@
 md5sum = []
-if host_machine.system() != 'windows'
-  md5sum = find_program('md5sum')
+if host_sys != 'windows'
+  md5sum = find_program('md5sum', required: false)
 endif
 
 i = 0
@@ -18,19 +18,21 @@ foreach conf : streflop_configurations
       args = join_paths(meson.current_build_dir(), name)
     endif
     test(name, exe, args: args, timeout: 360)
-    if test == 'arithmeticTest' and md5sum.found() and conf['suffix'] != '-x87'
-      test(
-        name + '-md5sum',
-        files('md5sum-wrapper.sh'),
-        env: [
-          'MESON_CURRENT_BUILD_DIR=' + meson.current_build_dir(),
-          'MESON_CURRENT_SOURCE_DIR=' + meson.current_source_dir(),
-          'MESON_TEST=' + name,
-        ],
-#         This is only supported by meson 1.6.0
-#         args: md5sum,
-        is_parallel: false,
-      )
+    if host_sys != 'windows' # TODO: Replace md5sum-wrapper.sh with a python script
+      if test == 'arithmeticTest' and md5sum.found()
+        test(
+          '-md5sum_' + name,
+          files('md5sum-wrapper.sh'),
+          env: [
+            'MESON_CURRENT_BUILD_DIR=' + meson.current_build_dir(),
+            'MESON_CURRENT_SOURCE_DIR=' + meson.current_source_dir(),
+            'MESON_TEST=' + name,
+          ],
+          # Using an object returned by find_program is only supported by meson >= 1.6.0
+          # args: md5sum,
+          is_parallel: false,
+        )
+      endif
     endif
   endforeach
   i = i + 1

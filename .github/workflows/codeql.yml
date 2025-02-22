@@ -51,7 +51,7 @@ jobs:
         languages: 'cpp'
 
     - run: |
-        meson setup -Dfpu=all -Db_sanitize=none builddir
+        meson setup -Dfpu=sse -Db_sanitize=none builddir
         cd builddir
         meson compile
         meson test

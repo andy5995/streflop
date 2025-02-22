@@ -12,12 +12,14 @@ on:
     branches: [ trunk ]
     paths:
     - '**'
+    - '!**.md'
     - '!**.yml'
     - '**/linux.yml'
   pull_request:
     branches: [ trunk ]
     paths:
     - '**'
+    - '!**.md'
     - '!**.yml'
     - '**/linux.yml'
 
@@ -26,12 +28,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-22.04, ubuntu-24.04, ubuntu-24.04-arm]
         cxx: [g++, clang++]
-        include:
-          - os: ubuntu-24.04-arm
-            cxx: g++
-
     runs-on: ${{ matrix.os }}
     env:
       CXX: ${{ matrix.cxx }}
@@ -44,11 +42,36 @@ jobs:
           sudo apt install -y --no-install-recommends pip
           sudo python3 -m pip install meson ninja
 
-      - name: Build
+      - name: sse-nd Build and Test
+        if: ${{ ! contains(matrix.os, 'arm') }}
         run: |
-          meson setup _build -Dfpu=all
+          meson setup _build -Dfpu=sse
           meson compile -C _build
+          meson test -C _build
 
-      - name: Test
+      - name: sse Build and Test
+        if: ${{ ! contains(matrix.os, 'arm') }}
         run: |
+          meson setup --reconfigure _build -Dfpu=sse -Ddenormals=true
+          meson compile -C _build
+          meson test -C _build
+
+      - name: x87-nd Build and Test
+        if: ${{ ! contains(matrix.os, 'arm') || matrix.cxx != 'clang++' }}
+        run: |
+          meson setup --reconfigure  _build -Ddefault_library=static -Dfpu=x87 -Ddenormals=false
+          meson compile -C _build
+          meson test -C _build
+
+      - name: x87 Build and Test
+        if: ${{ ! contains(matrix.os, 'arm') || matrix.cxx != 'clang++' }}
+        run: |
+          meson setup --reconfigure  _build -Dfpu=x87 -Ddenormals=true
+          meson compile -C _build
+          meson test -C _build
+
+      - name: soft Build and Test
+        run: |
+          meson setup --reconfigure  _build -Ddefault_library=shared -Dfpu=soft -Ddenormals=true
+          meson compile -C _build
           meson test -C _build
