@@ -35,7 +35,12 @@ jobs:
         prepare: |
           pkg install -y meson
         run: |
-          meson setup _build -Dfpu=sse -Ddenormals=false
-          meson test -v -C _build
+          meson setup _build -Dfpu=sse
+          meson compile -C _build
+          meson test -C _build
           meson setup --reconfigure _build -Dfpu=sse -Ddenormals=true
-          meson test -v -C _build
+          meson compile -C _build
+          meson test -C _build
+          meson setup --reconfigure  _build -Ddefault_library=shared -Dfpu=soft -Ddenormals=true
+          meson compile -C _build
+          meson test -C _build

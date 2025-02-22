@@ -30,11 +30,8 @@ jobs:
       - name: Install dependencies
         run: brew install meson
 
-      - name: sse_nd
+      - name: soft Build and Test
         run: |
-          meson setup _build -Dfpu=sse -Ddenormals=false
+          meson setup --reconfigure  _build -Ddefault_library=shared -Dfpu=soft -Ddenormals=true
           meson compile -C _build
-
-      - name: Test
-        run: |
           meson test -C _build

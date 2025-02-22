@@ -5,11 +5,13 @@ project(
   version: '0.3.05',
   meson_version: '>= 0.64.0',
 )
-
 # The current required meson version of 0.63.0 is to prevent this error:
 #
 #../meson.build:163:2: ERROR: List item must be one of <class 'str'>, not <class 'list'>
 # when using a list as the kwarg for compile_args in declare dependency()
+
+host_sys = host_machine.system()
+host_arch = host_machine.cpu_family()
 
 cxx = meson.get_compiler('cpp')
 
@@ -17,10 +19,14 @@ extra_flags = [
   '-frounding-math',
   '-fsignaling-nans',
   '-fno-strict-aliasing',
-  '-mieee-fp',
   '-pipe',
 ]
-
+if host_arch != 'aarch64'
+  extra_flags += '-mieee-fp'
+endif
+# These are used for all the libraries but not for the tests
+# and they're not added as cflags to the dependency object or
+# .pc files
 extra_flags = cxx.get_supported_arguments(extra_flags)
 
 fpu_opt = get_option('fpu')
@@ -101,7 +107,7 @@ if fpu_opt != 'all'
       break
     endif
   endforeach
-  if streflop_configurations.length() != 1
+  if conf['fpu'] != fpu_opt
     error('Requested fpu/denormals combination not available')
   endif
 endif
@@ -142,7 +148,6 @@ foreach conf : streflop_configurations
         softconf['name'],
         ['SoftFloatWrapper.cpp'],
         cpp_args: [extra_flags, softconf['defs'], conf['defs'], conf['flags']],
-        build_by_default: true,
       )
     endforeach
   endif
@@ -151,7 +156,7 @@ foreach conf : streflop_configurations
     meson.project_name() + conf['suffix'],
     ['SMath.cpp', 'Random.cpp', _soft_src],
     #version: meson.project_version(),
-    cpp_args: [conf['flags'], conf['defs']],
+    cpp_args: [extra_flags, conf['flags'], conf['defs']],
     link_whole: [
       _flt32_lib[i],
       _dbl64_lib[i],
@@ -171,7 +176,7 @@ foreach conf : streflop_configurations
   streflop_dep += declare_dependency(
     link_with: streflop_ng[i],
     include_directories: include_directories('.'),
-    compile_args: [conf['defs'], conf['flags']],
+    compile_args: [conf['defs']],
   )
   i = i + 1
 endforeach
@@ -194,7 +199,7 @@ if not is_subproject
       description: desc,
       subdirs: h_subdir,
       url: 'https://github.com/andy5995/streflop-ng',
-      extra_cflags: [conf['defs'], conf['flags']],
+      extra_cflags: conf['defs'],
     )
     i = i + 1
   endforeach
@@ -208,7 +213,7 @@ if not meson.is_subproject()
 endif
 
 install_data(
-  ['LICENSE', 'README.md', 'libm/README.txt'],
+  ['LICENSE', 'README.md', 'libm/README.txt', 'ChangeLog'],
   preserve_path: true,
   install_dir: get_option('docdir'),
 )
